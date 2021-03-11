@@ -3,6 +3,7 @@ from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from math import sqrt
 from copy import deepcopy
+from time import sleep 
 
 def genCallBack() -> None: 
     vel_msg = Twist()
@@ -61,7 +62,7 @@ def move_to_point():
 
     pub = rospy.Publisher('cmd_vel' , Twist, queue_size = 1)
     msg = Twist()
-    msg.linear.x = 0.1
+    msg.linear.x = 0.2
     pub.publish(msg)
 
     loop_rate = rospy.Rate(1000)
@@ -75,6 +76,9 @@ def move_to_point():
     msg.linear.x = 0.0
     pub.publish(msg)
 
+
+
 rate = rospy.Rate(10)
 genCallBack()
 move_to_point()
+sleep(5)
