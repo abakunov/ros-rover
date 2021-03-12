@@ -1,5 +1,8 @@
 from geometryHelpers import calculate_dist, quaternion_to_theta
 import math
+import threading
+import sys
+import trace
 
 #Ориентация в квантерионах
 class QuantPos:
@@ -57,3 +60,66 @@ class Position(Point):
 
     def __repr__(self):
         return super(Position,self).__repr__()+"\n"+self.theta.__repr__()
+
+#поток, который можно убить
+class KThread(threading.Thread):
+  def __init__(self, *args, **keywords):
+    threading.Thread.__init__(self, *args, **keywords)
+    self.killed = False
+
+  def start(self):
+    """Start the thread."""
+    self.__run_backup = self.run
+    self.run = self.__run      
+    threading.Thread.start(self)
+
+  def __run(self):
+    sys.settrace(self.globaltrace)
+    self.__run_backup()
+    self.run = self.__run_backup
+
+  def globaltrace(self, frame, why, arg):
+    if why == 'call':
+      return self.localtrace
+    else:
+      return None
+
+  def localtrace(self, frame, why, arg):
+    if self.killed:
+      if why == 'line':
+        raise SystemExit()
+    return self.localtrace
+
+  def kill(self):
+    self.killed = True
+
+
+#таск для очереди
+class TodoTask():
+
+
+    def __init__(self, doneCallback, task, stopFunction, *args):
+        
+        self.doneCallback = doneCallback
+        self.task = task
+        self.stopFunction = stopFunction
+        self.done = False
+
+    def run(self,*args):
+        self.thread = KThread(target = self.worker, *args,)
+        self.thread.start()
+
+    def worker(self,*args):
+        self.task(*args)
+        self.doneCallback()
+
+
+    def pause(self):
+        #TODO implement the pause
+        self.thread.do_run = not self.thread.do_run
+        print("Pause")
+
+    def stop(self):
+        
+        self.thread.kill()
+        self.stopFunction()
