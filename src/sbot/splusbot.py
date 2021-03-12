@@ -16,9 +16,13 @@ class SPlusBot:
         self.position.x = data.pose.pose.position.x
         self.position.y = data.pose.pose.position.y
 
-    def _getCurrentLocation(self):
-        #TODO implement getting current location
-        time.sleep(3)
+    def _getCurrentLocation(self) -> None:
+
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
+        while self.position == Point(0 , 0):
+            loop_rate.sleep()
+            
+        return
 
     def __init__(self):
 
