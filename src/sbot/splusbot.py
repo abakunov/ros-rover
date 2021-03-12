@@ -78,7 +78,6 @@ class SPlusBot:
         
         startPos = deepcopy(self.position.theta)
 
-        time.sleep(2)
         msg = Twist()
         msg.angular.z = 0.1
         loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
@@ -86,7 +85,7 @@ class SPlusBot:
 
             self.velPub.publish(msg)
             loop_rate.sleep()
+        
         self.stop()
-        time.sleep(2)
 
         
