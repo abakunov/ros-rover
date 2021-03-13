@@ -8,6 +8,10 @@ import threading
 import robotTasks
 from splusbot import SPlusBot
 from copy import deepcopy
+from servo-pub import ServoController
+
+rospy.init_node('main_node')
+
 
 ##CONFVARS##
 
@@ -18,8 +22,41 @@ ANGULAR_SPEED = 0.2
 
 queue = []
 activeTask = None
+SERVO = ServoController()
 
 ############COMMANDS##############
+
+####SERVOVERTICALROTATE##############
+
+def servoRotateHorizontalDone():
+    global queue,activeTask
+    queue.pop(0)
+    activeTask = None
+    bot.stop()
+
+def servoRotateHorizontal(params):
+    global queue,activeTask
+
+    val1 = params[0]
+    val2 = params[1]
+
+    deg = int(val1 + val2,16)  
+    SERVO.moveHorizontal(deg)
+
+def servoRotateHorizontalStop():
+    global queue,activeTask
+    bot.stop()
+    activeTask = None
+    queue = []
+
+servoRotateHorizontalTask = TodoTask(
+    servoRotateHorizontalDone,
+    servoRotateHorizontal,
+    servoRotateHorizontalStop,
+    name='MoveForward', 
+)
+
+####SERVOVERTICALROTATE##############
 
 ####ROBOTMOVECOMMAND##############
 
@@ -210,7 +247,15 @@ rotateRightTask = TodoTask(
 
 
 
-commands = {'64' : robotMoveTask, 'cc' : setLinearTask, 'aa' : setAngularTask, 'bb' : robotMoveBackTask,'03' : rotateLeftTask, '04' : rotateRightTask}
+commands = {
+    '64' : robotMoveTask,
+    'cc' : setLinearTask,
+    'aa' : setAngularTask,
+    'bb' : robotMoveBackTask,
+    '03' : rotateLeftTask, 
+    '04' : rotateRightTask,
+    '05' : servoRotateHorizontalTask
+    }
 bot = SPlusBot()
 
 def set_q():
