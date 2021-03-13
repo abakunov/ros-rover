@@ -14,7 +14,6 @@ def quaternion_to_theta(quant):
     t2 = +1.0 - 2.0 * (quant.y ** 2 + quant.z**2)
 
     res = math.degrees(math.atan2(t1, t2))
-    print(res)
     if  res < 0:
         return abs(res)
 

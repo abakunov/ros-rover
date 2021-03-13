@@ -97,7 +97,7 @@ class KThread(threading.Thread):
 class TodoTask():
 
 
-    def __init__(self, doneCallback, task, stopFunction,name = "todotask", *args):
+    def __init__(self, doneCallback, task, stopFunction,*args,name = "todotask", ):
         
         self.doneCallback = doneCallback
         self.task = task
@@ -105,14 +105,15 @@ class TodoTask():
         self.done = False
         self.name = name
         self.status = "Waiting"
+        self.params = args
 
-    def run(self,*args):
+    def run(self):
         self.status = "Running"
-        self.thread = KThread(target = self.worker, *args,)
+        self.thread = KThread(target = self.worker, )
         self.thread.start()
 
-    def worker(self,*args):
-        self.task(*args)
+    def worker(self):
+        self.task(self.params)
         self.status = "Done"
         self.doneCallback()
         

@@ -1,4 +1,5 @@
 from classes import TodoTask
+#from mainContrroller import queue,activeTask
 
 def robotMoveDone():
     global activeTask

@@ -74,13 +74,13 @@ class SPlusBot:
         self.stop()
         print("Moved to:\n",self.position)
 
-    def rotate(self,degrees : float) -> None:
+    def rotate(self,degrees : float, speed:float) -> None:
         
         startPos = deepcopy(self.position.theta)
 
         msg = Twist()
-        msg.angular.z = 0.1
-        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
+        msg.angular.z = speed
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE * 100)
         while abs(self.position.theta.toTheta() - startPos.toTheta()) < degrees:
 
             self.velPub.publish(msg)
