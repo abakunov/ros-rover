@@ -5,7 +5,7 @@ import time
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 
-from classes import Point,Position,QuantPos
+from classes import Point,Position,QuantPos, ServoController
 
 from copy import deepcopy
 
@@ -36,8 +36,10 @@ class SPlusBot:
         rospy.init_node(config.INIT_NODE_NAME)
         self.odomSub = rospy.Subscriber(config.ODOM_TOPIC_NAME, Odometry, self.positionCallback)
         self.velPub = rospy.Publisher(config.CMD_VEL_TOPIC_NAME, Twist, queue_size = 10)
-
+        self.servo = ServoController()
         self.position = Position(QuantPos(), -1 , -1)
+        self.LINEAR_SPEED = config.DEFAULT_SPEED
+        self.ANGULAR_SPEED = config.DEFAULT_ANGULAR_SPEED
 
         self._getCurrentLocation()
 
@@ -58,6 +60,9 @@ class SPlusBot:
     
     def move_forward(self, metres : float, velocity : float = config.DEFAULT_SPEED ):
 
+        if velocity == config.DEFAULT_SPEED:
+            velocity = self.LINEAR_SPEED
+
         startPoint = Point(self.position.x , self.position.y)
 
         print("Moving from:\n",startPoint)
@@ -74,8 +79,11 @@ class SPlusBot:
         self.stop()
         print("Moved to:\n",self.position)
 
-    def rotate(self,degrees : float, speed:float) -> None:
+    def rotate(self,degrees : float, speed :float = -191 ) -> None:
         
+        if speed == -191:
+            speed = self.ANGULAR_SPEED
+
         startPos = deepcopy(self.position.theta)
 
         msg = Twist()
@@ -87,5 +95,11 @@ class SPlusBot:
             loop_rate.sleep()
         
         self.stop()
+    
+    def servoRotateHorizontal(self, angle : int):
+        self.servo.moveHorizontal(angle)
+    
+    def servoRotateVertical(self, angle : int):
+        self.servo.moveVertical(angle)
 
         

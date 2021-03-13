@@ -3,6 +3,9 @@ import math
 import threading
 import sys
 import trace
+from config import VERTICAL_SERVO_TOPIC_NAME, HORIZONTAL_SERVO_TOPIC_NAME
+import rospy
+from std_msgs.msg import UInt16
 
 #Ориентация в квантерионах
 class QuantPos:
@@ -92,12 +95,22 @@ class KThread(threading.Thread):
     def kill(self):
         self.killed = True
 
+class ActiveTask:
+
+    def __init__(self, task = None):
+        self.task = task
+    
+    def change(self, new_value):
+        self.task = new_value
+
+    def __repr__(self):
+        return self.task.__repr__
 
 #таск для очереди
 class TodoTask():
 
 
-    def __init__(self, doneCallback, task, stopFunction,*args,name = "todotask", ):
+    def __init__(self, doneCallback, task, stopFunction,*args,name = "todotask", **kwargs ):
         
         self.doneCallback = doneCallback
         self.task = task
@@ -106,6 +119,9 @@ class TodoTask():
         self.name = name
         self.status = "Waiting"
         self.params = args
+        self.queue = None
+        self.activeTask = None
+        self.bot = None
 
     def run(self):
         self.status = "Running"
@@ -113,9 +129,11 @@ class TodoTask():
         self.thread.start()
 
     def worker(self):
-        self.task(self.params)
+        self.task(self.params, bot = self.bot)
         self.status = "Done"
-        self.doneCallback()
+        self.queue.pop(0)
+        self.activeTask.change(None)
+        self.doneCallback(bot = self.bot)
         
 
 
@@ -128,8 +146,22 @@ class TodoTask():
         
         self.thread.kill()
         self.status = "Killed"
-        self.stopFunction()
+        self.activeTask.change(None)
+        while self.queue : self.queue.pop(0)
+        self.stopFunction(bot = self.bot)
 
     def __repr__(self):
 
         return "Task. Status : {}. Name : {}".format(self.status,self.name)
+
+
+class ServoController:
+
+    pub1 = rospy.Publisher(VERTICAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
+    pub2 = rospy.Publisher(HORIZONTAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
+
+    def moveHorizontal(self,deg:int):
+        self.pub1.publish(deg)
+    
+    def moveVertical(self,deg:int):
+        self.pub2.publish(deg)

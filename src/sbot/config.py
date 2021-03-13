@@ -3,6 +3,8 @@
 INIT_NODE_NAME = "splus_bot"
 CMD_VEL_TOPIC_NAME = "cmd_vel"
 ODOM_TOPIC_NAME = "odom"
+HORIZONTAL_SERVO_TOPIC_NAME = "horizontal_servo"
+VERTICAL_SERVO_TOPIC_NAME = "vertical_servo"
 
 #CONSTANTS
 
@@ -10,7 +12,8 @@ DEFAULT_LOOP_RATE = 100
 
 #ENV STUFF
 MISTAKE_COEF = 1
-DEFAULT_SPEED = 0.1
+DEFAULT_SPEED = 0.2
+DEFAULT_ANGULAR_SPEED = 0.2
 MISTAKE_ROTATE_COEF = 0.835
 SERIAL_PORT = "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0"
 

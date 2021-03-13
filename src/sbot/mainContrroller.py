@@ -3,12 +3,24 @@ import struct
 import serial
 from time import sleep
 import config
-from classes import TodoTask
+from classes import TodoTask,ServoController,ActiveTask
 import threading
 import robotTasks
 from splusbot import SPlusBot
 from copy import deepcopy
-from servo-pub import ServoController
+import rospy
+
+import sys
+
+sys.path.append('./robotTasks')
+from servoVerticalRotateTask import servoRotateVerticalTask
+from servoHorizontalRotateTask import servoHorizontalTask
+from moveForwardTask import robotmoveForwardTask
+from moveBackwardTask import robotmoveBackwardTask
+from setLinearSpeedTask import setLinearTask
+from setAngularSpeedTask import setAngularTask
+from rotateLeftTask import rotateLeftTask
+from rotateRightTask import rotateRightTask
 
 rospy.init_node('main_node')
 
@@ -21,240 +33,23 @@ ANGULAR_SPEED = 0.2
 ##CONFVARS##
 
 queue = []
-activeTask = None
+activeTask = ActiveTask(None)
 SERVO = ServoController()
 
-############COMMANDS##############
 
-####SERVOVERTICALROTATE##############
-
-def servoRotateHorizontalDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def servoRotateHorizontal(params):
-    global queue,activeTask
-
-    val1 = params[0]
-    val2 = params[1]
-
-    deg = int(val1 + val2,16)  
-    SERVO.moveHorizontal(deg)
-
-def servoRotateHorizontalStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-servoRotateHorizontalTask = TodoTask(
-    servoRotateHorizontalDone,
-    servoRotateHorizontal,
-    servoRotateHorizontalStop,
-    name='MoveForward', 
-)
-
-####SERVOVERTICALROTATE##############
-
-####ROBOTMOVECOMMAND##############
-
-def robotMoveDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def robotMoveTask(params):
-    global queue,activeTask
-
-    print(params)
-    val1 = params[0]
-    val2 = params[1]
-
-    dist = int(val1 + val2,16) / 100   
-    print(LINEAR_SPEED)
-    bot.move_forward(dist,LINEAR_SPEED)
-
-def robotMoveStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-robotMoveTask = TodoTask(
-    robotMoveDone,
-    robotMoveTask,
-    robotMoveStop,
-    name='MoveForward', 
-)
-
-####ROBOTMOVEBACKWARDCOMMAND##############
-
-def robotMoveBackwardDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def robotMoveBackwardTask(params):
-    global queue,activeTask
-
-    print(params)
-    val1 = params[0]
-    val2 = params[1]
-
-    dist = int(val1 + val2,16) / 100   
-    print(LINEAR_SPEED)
-    bot.move_forward(dist,-LINEAR_SPEED)
-
-def robotMoveBackwardStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-robotMoveBackTask = TodoTask(
-    robotMoveBackwardDone,
-    robotMoveBackwardTask,
-    robotMoveBackwardStop,
-    name='MoveBackward', 
-)
-
-####SETLINEARSPEED##############
-def setLinearDone():
-
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-
-def setLinear(params):
-    global LINEAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    speed = int(val1 + val2,16) / 100
-    print("SETTING LIN", speed)
-    LINEAR_SPEED = speed
-
-def cancelLinearSet():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-
-setLinearTask = TodoTask(
-    setLinearDone,
-    setLinear,
-    cancelLinearSet,
-    name='SetLinear', 
-)
-
-####SETLINEARSPEED##############
-
-####SETANGULARSPEED##############
-def setAngularDone():
-
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-
-def setAngular(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    speed = int(val1 + val2,16) / 100
-
-    ANGULAR_SPEED = speed
-
-def cancelAngularSet():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-
-setAngularTask = TodoTask(
-    setAngularDone,
-    setAngular,
-    cancelAngularSet,
-    name='SetAngular', 
-)
-
-####SETANGULARSPEED##############
-
-
-####ROBOTROTATELEFT##############
-def RotateLeftDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def RotateLeft(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    deg = int(val1 + val2,16) 
-
-    bot.rotate(deg, -ANGULAR_SPEED)
-
-def cancelRotateLeft():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-    bot.stop()
-
-rotateLeftTask = TodoTask(
-    RotateLeftDone,
-    RotateLeft,
-    cancelRotateLeft,
-    name='RotateLeft', 
-)
-
-####ROBOTROTATELEFT##############
-
-####ROBOTROTATERIGHT##############
-def RotateRightDone():
-    print("IMDONE")
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def RotateRight(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    deg = int(val1 + val2,16) 
-    bot.rotate(deg, ANGULAR_SPEED)
-
-def cancelRotateRight():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-    bot.stop()
-
-rotateRightTask = TodoTask(
-    RotateRightDone,
-    RotateRight,
-    cancelRotateRight,
-    name='RotateRight', 
-)
-
-####ROBOTROTATELEFT##############
-
-
-############COMMANDS##############
 
 
 
 
 commands = {
-    '64' : robotMoveTask,
+    '64' : robotmoveForwardTask,
     'cc' : setLinearTask,
     'aa' : setAngularTask,
-    'bb' : robotMoveBackTask,
+    'bb' : robotmoveBackwardTask,
     '03' : rotateLeftTask, 
     '04' : rotateRightTask,
-    '05' : servoRotateHorizontalTask
+    '05' : servoHorizontalTask,
+    '06' : servoRotateVerticalTask
     }
 bot = SPlusBot()
 
@@ -311,8 +106,13 @@ def worker():
             sleep(0.05)
             continue
 
-        activeTask = queue[0]
-        activeTask.run()
+        activeTask.change(queue[0])
+
+        activeTask.bot = bot
+        activeTask.queue = queue
+        activeTask.activeTask = activeTask
+
+        activeTask.task.run()
 
         sleep(0.05)
 
