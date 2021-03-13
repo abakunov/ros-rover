@@ -37,32 +37,13 @@ def parse_packages(*args):
         if command in commands:
             queue.append((commands[command]))
 
-ser = serial.Serial(config.SERIAL_PORT, 19200)    #Open port with baud rate
-
-
-def stop():
-    #TODO stop the robot
-    print("Stopping")
-    queue = []
-
-def move(v1,v2):
-    print("Moving")
+ser = serial.Serial(config.SERIAL_PORT, 19200)
 
 
 
 def send_bytes():
     msg = struct.pack('!3c', b'm', b'3', b'2')
     parse_packages(msg,msg,msg)
-
-
-        
-
-
-
-
-def set_q():
-    global queue
-    queue = []
 
 def worker():
 
@@ -87,9 +68,9 @@ def reciving_data():
     global queue,activeTask
     while True:
         
-        received_data = ser.read()              #read serial port
+        received_data = ser.read()              
         sleep(0.03)
-        data_left = ser.inWaiting()             #check for remaining byte
+        data_left = ser.inWaiting()             
         received_data += ser.read(data_left)
         parse_packages(received_data)
         print(queue)

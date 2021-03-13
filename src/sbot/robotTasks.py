@@ -18,5 +18,6 @@ def robotMoveStop():
 robotMoveTask = TodoTask(
     robotMoveDone,
     robotMoveTask,
-    robotMoveStop
+    robotMoveStop,
+    name='MoveForward'
 )

@@ -63,55 +63,59 @@ class Position(Point):
 
 #поток, который можно убить
 class KThread(threading.Thread):
-  def __init__(self, *args, **keywords):
-    threading.Thread.__init__(self, *args, **keywords)
-    self.killed = False
+    def __init__(self, *args, **keywords):
+        threading.Thread.__init__(self, *args, **keywords)
+        self.killed = False
 
-  def start(self):
-    """Start the thread."""
-    self.__run_backup = self.run
-    self.run = self.__run      
-    threading.Thread.start(self)
+    def start(self):
+        self.__run_backup = self.run
+        self.run = self.__run            
+        threading.Thread.start(self)
 
-  def __run(self):
-    sys.settrace(self.globaltrace)
-    self.__run_backup()
-    self.run = self.__run_backup
+    def __run(self):
+        sys.settrace(self.globaltrace)
+        self.__run_backup()
+        self.run = self.__run_backup
 
-  def globaltrace(self, frame, why, arg):
-    if why == 'call':
-      return self.localtrace
-    else:
-      return None
+    def globaltrace(self, frame, why, arg):
+        if why == 'call':
+            return self.localtrace
+        else:
+            return None
 
-  def localtrace(self, frame, why, arg):
-    if self.killed:
-      if why == 'line':
-        raise SystemExit()
-    return self.localtrace
+    def localtrace(self, frame, why, arg):
+        if self.killed:
+            if why == 'line':
+                raise SystemExit()
+        return self.localtrace
 
-  def kill(self):
-    self.killed = True
+    def kill(self):
+        self.killed = True
 
 
 #таск для очереди
 class TodoTask():
 
 
-    def __init__(self, doneCallback, task, stopFunction, *args):
+    def __init__(self, doneCallback, task, stopFunction,name = "todotask", *args):
         
         self.doneCallback = doneCallback
         self.task = task
         self.stopFunction = stopFunction
         self.done = False
+        self.name = name
+        self.status = "Waiting"
 
     def run(self,*args):
+        self.status = "Running"
         self.thread = KThread(target = self.worker, *args,)
         self.thread.start()
 
     def worker(self,*args):
         self.task(*args)
+        self.status = "Done"
         self.doneCallback()
+        
 
 
     def pause(self):
@@ -122,4 +126,9 @@ class TodoTask():
     def stop(self):
         
         self.thread.kill()
+        self.status = "Killed"
         self.stopFunction()
+
+    def __repr__(self):
+
+        return "Task. Status : {}. Name : {}".format(self.status,self.name)
