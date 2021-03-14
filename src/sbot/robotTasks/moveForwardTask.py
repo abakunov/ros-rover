@@ -8,6 +8,9 @@ def robotMoveDone(**kwargs):
     bot.stop()
 
 def robotMoveTask(params, **kwargs):
+    print(params)
+    print(kwargs)
+
     bot = kwargs.get('bot')
     val1 = params[0]
     val2 = params[1]

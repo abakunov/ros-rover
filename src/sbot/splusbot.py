@@ -97,6 +97,7 @@ class SPlusBot:
         self.stop()
     
     def servoRotateHorizontal(self, angle : int):
+        
         self.servo.moveHorizontal(angle)
     
     def servoRotateVertical(self, angle : int):

@@ -19,6 +19,7 @@ def servoRotateHorizontal(params, **kwargs):
     val2 = params[1]
 
     deg = int(val1 + val2,16)  
+
     bot.servoRotateHorizontal(deg)
 
 def servoRotateHorizontalStop(**kwargs):

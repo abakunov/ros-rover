@@ -104,7 +104,7 @@ class ActiveTask:
         self.task = new_value
 
     def __repr__(self):
-        return self.task.__repr__
+        return self.task.__repr__()
 
 #таск для очереди
 class TodoTask():
@@ -156,9 +156,11 @@ class TodoTask():
 
 
 class ServoController:
+    
 
-    pub1 = rospy.Publisher(VERTICAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
-    pub2 = rospy.Publisher(HORIZONTAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
+    def __init__(self):
+        self.pub1 = rospy.Publisher(HORIZONTAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
+        self.pub2 = rospy.Publisher(VERTICAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
 
     def moveHorizontal(self,deg:int):
         self.pub1.publish(deg)

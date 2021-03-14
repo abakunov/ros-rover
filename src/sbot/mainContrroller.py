@@ -14,43 +14,32 @@ import sys
 
 sys.path.append('./robotTasks')
 from servoVerticalRotateTask import servoRotateVerticalTask
-from servoHorizontalRotateTask import servoHorizontalTask
+from servoHorizontalRotateTask import servoRotateHorizontalTask
 from moveForwardTask import robotmoveForwardTask
-from moveBackwardTask import robotmoveBackwardTask
+from moveBackWardTask import robotMoveBackTask
 from setLinearSpeedTask import setLinearTask
 from setAngularSpeedTask import setAngularTask
 from rotateLeftTask import rotateLeftTask
 from rotateRightTask import rotateRightTask
 
-rospy.init_node('main_node')
-
-
-##CONFVARS##
-
-LINEAR_SPEED = 0.2
-ANGULAR_SPEED = 0.2
-
-##CONFVARS##
 
 queue = []
 activeTask = ActiveTask(None)
 SERVO = ServoController()
 
 
-
-
-
-
 commands = {
     '64' : robotmoveForwardTask,
     'cc' : setLinearTask,
     'aa' : setAngularTask,
-    'bb' : robotmoveBackwardTask,
+    'bb' : robotMoveBackTask,
     '03' : rotateLeftTask, 
     '04' : rotateRightTask,
-    '05' : servoHorizontalTask,
+    '05' : servoRotateHorizontalTask,
     '06' : servoRotateVerticalTask
-    }
+}
+
+
 bot = SPlusBot()
 
 def set_q():
@@ -67,10 +56,10 @@ def parse_packages(*args):
         v2 = v2.hex()
 
         if command == config.STOP_COMMAND_NAME:
-            activeTask.stop()
+            activeTask.task.stop()
             continue
         if command == config.PAUSE_COMMAND_NAME:
-            activeTask.pause()
+            activeTask.task.pause()
             continue
         
         
@@ -84,33 +73,30 @@ def parse_packages(*args):
             todoCommand.params = [v1,v2]
             queue.append(todoCommand)
 
+
 ser = serial.Serial(config.SERIAL_PORT, 19200)
 
-
-
-def send_bytes():
-    msg = struct.pack('!3c', b'm', b'3', b'2')
-    parse_packages(msg,msg,msg)
 
 def worker():
     
     global queue,activeTask
     
     while True:
+
         if not queue:
             sleep(0.05)
             continue
         
-        if activeTask:
+        if activeTask.task:
             
             sleep(0.05)
             continue
 
         activeTask.change(queue[0])
 
-        activeTask.bot = bot
-        activeTask.queue = queue
-        activeTask.activeTask = activeTask
+        activeTask.task.bot = bot
+        activeTask.task.queue = queue
+        activeTask.task.activeTask = activeTask
 
         activeTask.task.run()
 
@@ -126,7 +112,7 @@ def reciving_data():
         received_data += ser.read(data_left)
         parse_packages(received_data)
         print(queue)
-        ser.write(b'Got it\n')
+        #ser.write(b'Command recived \n')
 
 
 def main():
