@@ -21,6 +21,7 @@ from setLinearSpeedTask import setLinearTask
 from setAngularSpeedTask import setAngularTask
 from rotateLeftTask import rotateLeftTask
 from rotateRightTask import rotateRightTask
+from ledtasks import ledOnTask,ledOffTask
 
 
 queue = []
@@ -30,6 +31,8 @@ SERVO = ServoController()
 
 commands = {
     '64' : robotmoveForwardTask,
+    '10' : ledOnTask,
+    '11' : ledOffTask,
     'cc' : setLinearTask,
     'aa' : setAngularTask,
     'bb' : robotMoveBackTask,

@@ -5,6 +5,7 @@ CMD_VEL_TOPIC_NAME = "cmd_vel"
 ODOM_TOPIC_NAME = "odom"
 HORIZONTAL_SERVO_TOPIC_NAME = "horizontal_servo"
 VERTICAL_SERVO_TOPIC_NAME = "vertical_servo"
+LED_TOPIC_NAME = "led_controller"
 
 #CONSTANTS
 
