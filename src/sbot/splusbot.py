@@ -65,7 +65,7 @@ class SPlusBot:
 
         startPoint = Point(self.position.x , self.position.y)
 
-        print("Moving from:\n",startPoint)
+        #print("Moving from:\n",startPoint)
 
         loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
         
@@ -77,7 +77,7 @@ class SPlusBot:
             loop_rate.sleep()
 
         self.stop()
-        print("Moved to:\n",self.position)
+        #print("Moved to:\n",self.position)
 
     def rotate(self,degrees : float, speed :float = -191 ) -> None:
         
@@ -88,12 +88,15 @@ class SPlusBot:
 
         msg = Twist()
         msg.angular.z = speed
-        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE * 100)
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
         while abs(self.position.theta.toTheta() - startPos.toTheta()) < degrees:
 
             self.velPub.publish(msg)
             loop_rate.sleep()
         
+        #print("Moved from", self.position.theta.toTheta())
+        #print("To: " , startPos.toTheta())
+
         self.stop()
     
     def servoRotateHorizontal(self, angle : int):

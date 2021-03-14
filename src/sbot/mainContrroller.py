@@ -45,33 +45,40 @@ bot = SPlusBot()
 def set_q():
     q = []
 
-def parse_packages(*args):
+def parse_packages(*packages):
+
     global queue,activeTask
-    for msg in args:
-        
-        command, v1, v2 = struct.unpack('!3c',msg)
+    
+    for package in packages:
 
-        command = command.hex()
-        v1 = v1.hex()
-        v2 = v2.hex()
+        arr_b = struct.unpack('!%dc' % len(package), package)
 
-        if command == config.STOP_COMMAND_NAME:
-            activeTask.task.stop()
-            continue
-        if command == config.PAUSE_COMMAND_NAME:
-            activeTask.task.pause()
-            continue
-        
-        
+        for i in range(0 , len(package) , 3):
 
-        if command in commands:
+            if (i + 2) > len(package) - 1:
+                break
+            
+            command, v1, v2 = arr_b[i] , arr_b[i + 1], arr_b[i + 2]
+            command = command.hex()
+            v1 = v1.hex()
+            v2 = v2.hex()
 
-            todoCommand = deepcopy(commands[command])
+            if command == config.STOP_COMMAND_NAME:
+                activeTask.task.stop()
+                continue
+            if command == config.PAUSE_COMMAND_NAME:
+                activeTask.task.pause()
+                continue
+
+            if command in commands:
+
+                todoCommand = deepcopy(commands[command])
 
 
 
-            todoCommand.params = [v1,v2]
-            queue.append(todoCommand)
+                todoCommand.params = [v1,v2]
+                queue.append(todoCommand)
+
 
 
 ser = serial.Serial(config.SERIAL_PORT, 19200)
