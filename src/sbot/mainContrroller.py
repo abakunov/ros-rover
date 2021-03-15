@@ -3,316 +3,112 @@ import struct
 import serial
 from time import sleep
 import config
-from classes import TodoTask
+from classes import TodoTask,ServoController,ActiveTask
 import threading
 import robotTasks
 from splusbot import SPlusBot
 from copy import deepcopy
-from servo-pub import ServoController
+import rospy
 
-rospy.init_node('main_node')
+import sys
 
+sys.path.append('./robotTasks')
+from servoVerticalRotateTask import servoRotateVerticalTask
+from servoHorizontalRotateTask import servoRotateHorizontalTask
+from moveForwardTask import robotmoveForwardTask
+from moveBackWardTask import robotMoveBackTask
+from setLinearSpeedTask import setLinearTask
+from setAngularSpeedTask import setAngularTask
+from rotateLeftTask import rotateLeftTask
+from rotateRightTask import rotateRightTask
+from ledtasks import ledOnTask,ledOffTask
 
-##CONFVARS##
-
-LINEAR_SPEED = 0.2
-ANGULAR_SPEED = 0.2
-
-##CONFVARS##
 
 queue = []
-activeTask = None
+activeTask = ActiveTask(None)
 SERVO = ServoController()
-
-############COMMANDS##############
-
-####SERVOVERTICALROTATE##############
-
-def servoRotateHorizontalDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def servoRotateHorizontal(params):
-    global queue,activeTask
-
-    val1 = params[0]
-    val2 = params[1]
-
-    deg = int(val1 + val2,16)  
-    SERVO.moveHorizontal(deg)
-
-def servoRotateHorizontalStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-servoRotateHorizontalTask = TodoTask(
-    servoRotateHorizontalDone,
-    servoRotateHorizontal,
-    servoRotateHorizontalStop,
-    name='MoveForward', 
-)
-
-####SERVOVERTICALROTATE##############
-
-####ROBOTMOVECOMMAND##############
-
-def robotMoveDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def robotMoveTask(params):
-    global queue,activeTask
-
-    print(params)
-    val1 = params[0]
-    val2 = params[1]
-
-    dist = int(val1 + val2,16) / 100   
-    print(LINEAR_SPEED)
-    bot.move_forward(dist,LINEAR_SPEED)
-
-def robotMoveStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-robotMoveTask = TodoTask(
-    robotMoveDone,
-    robotMoveTask,
-    robotMoveStop,
-    name='MoveForward', 
-)
-
-####ROBOTMOVEBACKWARDCOMMAND##############
-
-def robotMoveBackwardDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def robotMoveBackwardTask(params):
-    global queue,activeTask
-
-    print(params)
-    val1 = params[0]
-    val2 = params[1]
-
-    dist = int(val1 + val2,16) / 100   
-    print(LINEAR_SPEED)
-    bot.move_forward(dist,-LINEAR_SPEED)
-
-def robotMoveBackwardStop():
-    global queue,activeTask
-    bot.stop()
-    activeTask = None
-    queue = []
-
-robotMoveBackTask = TodoTask(
-    robotMoveBackwardDone,
-    robotMoveBackwardTask,
-    robotMoveBackwardStop,
-    name='MoveBackward', 
-)
-
-####SETLINEARSPEED##############
-def setLinearDone():
-
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-
-def setLinear(params):
-    global LINEAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    speed = int(val1 + val2,16) / 100
-    print("SETTING LIN", speed)
-    LINEAR_SPEED = speed
-
-def cancelLinearSet():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-
-setLinearTask = TodoTask(
-    setLinearDone,
-    setLinear,
-    cancelLinearSet,
-    name='SetLinear', 
-)
-
-####SETLINEARSPEED##############
-
-####SETANGULARSPEED##############
-def setAngularDone():
-
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-
-def setAngular(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    speed = int(val1 + val2,16) / 100
-
-    ANGULAR_SPEED = speed
-
-def cancelAngularSet():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-
-setAngularTask = TodoTask(
-    setAngularDone,
-    setAngular,
-    cancelAngularSet,
-    name='SetAngular', 
-)
-
-####SETANGULARSPEED##############
-
-
-####ROBOTROTATELEFT##############
-def RotateLeftDone():
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def RotateLeft(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    deg = int(val1 + val2,16) 
-
-    bot.rotate(deg, -ANGULAR_SPEED)
-
-def cancelRotateLeft():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-    bot.stop()
-
-rotateLeftTask = TodoTask(
-    RotateLeftDone,
-    RotateLeft,
-    cancelRotateLeft,
-    name='RotateLeft', 
-)
-
-####ROBOTROTATELEFT##############
-
-####ROBOTROTATERIGHT##############
-def RotateRightDone():
-    print("IMDONE")
-    global queue,activeTask
-    queue.pop(0)
-    activeTask = None
-    bot.stop()
-
-def RotateRight(params):
-    global ANGULAR_SPEED
-    val1 = params[0]
-    val2 = params[1]
-    deg = int(val1 + val2,16) 
-    bot.rotate(deg, ANGULAR_SPEED)
-
-def cancelRotateRight():
-    global queue,activeTask
-    activeTask = None
-    queue = []
-    bot.stop()
-
-rotateRightTask = TodoTask(
-    RotateRightDone,
-    RotateRight,
-    cancelRotateRight,
-    name='RotateRight', 
-)
-
-####ROBOTROTATELEFT##############
-
-
-############COMMANDS##############
-
-
 
 
 commands = {
-    '64' : robotMoveTask,
+    '64' : robotmoveForwardTask,
+    '10' : ledOnTask,
+    '11' : ledOffTask,
     'cc' : setLinearTask,
     'aa' : setAngularTask,
     'bb' : robotMoveBackTask,
     '03' : rotateLeftTask, 
     '04' : rotateRightTask,
-    '05' : servoRotateHorizontalTask
-    }
+    '05' : servoRotateHorizontalTask,
+    '06' : servoRotateVerticalTask
+}
+
+
 bot = SPlusBot()
 
 def set_q():
     q = []
 
-def parse_packages(*args):
+def parse_packages(*packages):
+
     global queue,activeTask
-    for msg in args:
-        
-        command, v1, v2 = struct.unpack('!3c',msg)
+    
+    for package in packages:
 
-        command = command.hex()
-        v1 = v1.hex()
-        v2 = v2.hex()
+        arr_b = struct.unpack('!%dc' % len(package), package)
 
-        if command == config.STOP_COMMAND_NAME:
-            activeTask.stop()
-            continue
-        if command == config.PAUSE_COMMAND_NAME:
-            activeTask.pause()
-            continue
-        
-        
+        for i in range(0 , len(package) , 3):
 
-        if command in commands:
+            if (i + 2) > len(package) - 1:
+                break
+            
+            command, v1, v2 = arr_b[i] , arr_b[i + 1], arr_b[i + 2]
+            command = command.hex()
+            v1 = v1.hex()
+            v2 = v2.hex()
 
-            todoCommand = deepcopy(commands[command])
+            if command == config.STOP_COMMAND_NAME:
+                activeTask.task.stop()
+                continue
+            if command == config.PAUSE_COMMAND_NAME:
+                activeTask.task.pause()
+                continue
+
+            if command in commands:
+
+                todoCommand = deepcopy(commands[command])
 
 
 
-            todoCommand.params = [v1,v2]
-            queue.append(todoCommand)
+                todoCommand.params = [v1,v2]
+                queue.append(todoCommand)
+
+
 
 ser = serial.Serial(config.SERIAL_PORT, 19200)
 
-
-
-def send_bytes():
-    msg = struct.pack('!3c', b'm', b'3', b'2')
-    parse_packages(msg,msg,msg)
 
 def worker():
     
     global queue,activeTask
     
     while True:
+
         if not queue:
             sleep(0.05)
             continue
         
-        if activeTask:
+        if activeTask.task:
             
             sleep(0.05)
             continue
 
-        activeTask = queue[0]
-        activeTask.run()
+        activeTask.change(queue[0])
+
+        activeTask.task.bot = bot
+        activeTask.task.queue = queue
+        activeTask.task.activeTask = activeTask
+
+        activeTask.task.run()
 
         sleep(0.05)
 
@@ -326,7 +122,7 @@ def reciving_data():
         received_data += ser.read(data_left)
         parse_packages(received_data)
         print(queue)
-        ser.write(b'Got it\n')
+        #ser.write(b'Command recived \n')
 
 
 def main():
