@@ -9,8 +9,8 @@ bot = SPlusBot()
 
 #print(bot.position.theta.toTheta())
 
-bot.move_forward(0.4,0.2)
-#bot.move2point(Point(0.5,0.5))
+#bot.move_forward(0.4,0.2)
+bot.move2point(Point(1,1))
 #bot.stop() 
 
 #sleep(2)

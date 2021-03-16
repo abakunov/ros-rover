@@ -22,7 +22,7 @@ from setAngularSpeedTask import setAngularTask
 from rotateLeftTask import rotateLeftTask
 from rotateRightTask import rotateRightTask
 from ledtasks import ledOnTask,ledOffTask
-
+from sendPhotoTask import SendPhotoTask
 
 queue = []
 activeTask = ActiveTask(None)
@@ -39,7 +39,8 @@ commands = {
     '03' : rotateLeftTask, 
     '04' : rotateRightTask,
     '05' : servoRotateHorizontalTask,
-    '06' : servoRotateVerticalTask
+    '06' : servoRotateVerticalTask,
+    'ee' : SendPhotoTask
 }
 
 
@@ -120,6 +121,7 @@ def reciving_data():
         sleep(0.03)
         data_left = ser.inWaiting()             
         received_data += ser.read(data_left)
+        print(received_data)
         parse_packages(received_data)
         print(queue)
         #ser.write(b'Command recived \n')
