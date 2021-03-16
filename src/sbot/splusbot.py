@@ -17,7 +17,7 @@ class SPlusBot:
     #обновление координат робота
     def positionCallback(self,data : Odometry) -> None:
         self.position.x = data.pose.pose.position.x
-        self.position.y = data.pose.pose.position.y
+        self.position.y = -data.pose.pose.position.y
         self.position.theta.z = data.pose.pose.orientation.z
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
@@ -113,6 +113,23 @@ class SPlusBot:
 
         self.stop()
     
+    def rotate2angle(self, angle : float, speed : float = 0.3):
+        
+
+
+        msg = Twist()
+        msg.angular.z = speed
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
+
+        while abs(self.position.theta.toTheta() - angle )>= 1:
+
+            self.velPub.publish(msg)
+            loop_rate.sleep()
+        
+        self.stop()
+
+        
+
     def move2point(self, point : Point):
         
         bot_pos = self.position
@@ -122,39 +139,46 @@ class SPlusBot:
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
-        deg = abs(np.degrees(np.arctan(y_diff / x_diff)))
+        deg = (abs(np.degrees(np.arctan(y_diff / x_diff))) + self.position.theta.toTheta()) % 360
         
-        print(deg)
+        print("START POINT:", self.position)
+
+        print("hep",hyp)
         print(x_diff,y_diff)
-        time.sleep(2)
+
+        
 
 
         if y_diff < 0:
             if x_diff < 0:
                 print(deg)
-                self.rotate(deg, -self.ANGULAR_SPEED)
+                
+                self.rotate2angle(deg, -self.ANGULAR_SPEED)
             else:
                 print(90 + deg)
-                self.rotate(90 + deg, self.ANGULAR_SPEED)
+                
+                self.rotate2angle(90 + deg, self.ANGULAR_SPEED)
         else:
             if x_diff < 0:
                 print(deg)
-                self.rotate(deg, -self.ANGULAR_SPEED)
+                
+                self.rotate2angle(deg, -self.ANGULAR_SPEED)
             else:
                 print(deg + 90)
-                self.rotate(deg + 90, -self.ANGULAR_SPEED)
+                
+                self.rotate2angle(deg + 90, -self.ANGULAR_SPEED)
         
         time.sleep(10)
 
         vel_msg = Twist()
         vel_msg.linear.x = self.LINEAR_SPEED
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
-        while abs(self.position - point) >= 0.05:
+        while abs(self.position - point) >= 0.02:
             print(abs(self.position - point))
             self.velPub.publish(vel_msg)
             rate.sleep()
         
-        bot.stop()
+        self.stop()
 
 
     def servoRotateHorizontal(self, angle : int):

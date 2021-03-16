@@ -166,6 +166,7 @@ class ServoController:
         self.pub1.publish(deg)
     
     def moveVertical(self,deg:int):
+        
         self.pub2.publish(deg)
 
 class LedController:
