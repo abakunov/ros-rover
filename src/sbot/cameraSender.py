@@ -12,6 +12,7 @@ import struct
 def send_data(data):
 
     print(type(data))
+    time.sleep(5)
     ser = serial.Serial(config.SERIAL_PORT, 19200)
 
     pack_size = 1024          
@@ -21,7 +22,7 @@ def send_data(data):
         serial_pack = data[i*pack_size:(i+1)*pack_size]
         send_bytes = ser.write(serial_pack)
         rospy.loginfo("Send data pack%i/%i: %s", i, pack_num, send_bytes)
-        time.sleep(1)
+        time.sleep(0.5)
     print("Exiting")
     time.sleep(10)
     ser.write(b'-1')
