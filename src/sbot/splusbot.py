@@ -22,6 +22,8 @@ class SPlusBot:
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
         self.position.theta.w = data.pose.pose.orientation.w
+        #test print
+        print(quaternion_to_euler(data.pose.orientation))
         #print(self.position.theta.toTheta())
 
     def _getCurrentLocation(self) -> None:
@@ -49,6 +51,8 @@ class SPlusBot:
         self.LINEAR_SPEED = config.DEFAULT_SPEED
         
         self.ANGULAR_SPEED = config.DEFAULT_ANGULAR_SPEED
+
+        self.predPositions = Position(QuantPos(), -1 , -1)
         
 
         self._getCurrentLocation()
