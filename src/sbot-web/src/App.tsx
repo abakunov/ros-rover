@@ -1,6 +1,7 @@
 import React from 'react';
 import './App.css';
 import { ChoosePortModal } from './components/choose-port-modal';
+import { Pallete } from './components/command-pallete';
 import { NavBar } from './components/navbar';
 
 enum ActivePage {
@@ -11,7 +12,7 @@ enum ActivePage {
 
 interface AppState{
   activePage : ActivePage,
-  port : String,
+  port : string,
 }
 
 class App extends React.Component<{},AppState>{
@@ -43,7 +44,7 @@ class App extends React.Component<{},AppState>{
 
         {
           this.state.activePage == ActivePage.Modal ? <ChoosePortModal choosePort = {this.choosePort}></ChoosePortModal>:
-          <div></div>
+          <Pallete port={this.state.port}/>
         }
 
         
