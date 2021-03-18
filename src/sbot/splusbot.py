@@ -16,8 +16,8 @@ class SPlusBot:
 
     #обновление координат робота
     def positionCallback(self,data : Odometry) -> None:
-        self.position.x = data.pose.pose.position.x
-        self.position.y = -data.pose.pose.position.y
+        self.position.y = data.pose.pose.position.x
+        self.position.x = -data.pose.pose.position.y
         self.position.theta.z = data.pose.pose.orientation.z
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
@@ -122,7 +122,7 @@ class SPlusBot:
         loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
 
         while abs(self.position.theta.toTheta() - angle )>= 1:
-
+            print(abs(self.position.theta.toTheta() - angle ))
             self.velPub.publish(msg)
             loop_rate.sleep()
         
@@ -145,8 +145,6 @@ class SPlusBot:
 
         print("hep",hyp)
         print(x_diff,y_diff)
-
-        
 
 
         if y_diff < 0:
