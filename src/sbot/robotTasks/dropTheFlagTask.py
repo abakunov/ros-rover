@@ -9,9 +9,6 @@ def dropFlagDone(**kwargs):
 
     print("dropped")
 
-    bot = kwargs.get('bot')
-
-    bot.stop()
 
 def dropFlag(params, **kwargs):
     
@@ -21,7 +18,7 @@ def dropFlag(params, **kwargs):
 def dropFlagStop(**kwargs):
     pass
 
-dropFlagTask = TodoTask(
+pauseTask = TodoTask(
         dropFlagDone,
         dropFlag,
         dropFlagStop,

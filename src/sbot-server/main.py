@@ -51,7 +51,7 @@ def execute_command ():
         elif len(value) == 3:
             s = "\\x"+value[1::]
             f = "\\x0" + value[0]
-        elif len(value) == 2:
+        elif len(value) == 4:
             s = "\\x"+value[2:]
             f = "\\x"+value[:3:]
 

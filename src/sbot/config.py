@@ -22,3 +22,6 @@ SERIAL_PORT = "/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Cont
 #COMMANDS
 STOP_COMMAND_NAME = "00"
 PAUSE_COMMAND_NAME = "01"
+M2P_SET_X = "c1"
+M2P_SET_Y = "c2"
+M2P_SEND = "c3"

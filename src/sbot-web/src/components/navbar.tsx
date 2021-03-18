@@ -16,7 +16,7 @@ export class NavBar extends React.Component<NavBarProps, NavBarState> {
         return (
             <div className="nav-wr">
                 <div className="container">
-                export      <div className="nav">
+                      <div className="nav">
                         <div className="nav-header flex-7">
                             S+ command palette
                         </div>

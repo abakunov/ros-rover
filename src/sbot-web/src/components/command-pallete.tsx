@@ -53,6 +53,7 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
         this.delcmd = this.delcmd.bind(this);
         this.sendCommads = this.sendCommads.bind(this);
         this.updateVal = this.updateVal.bind(this);
+        this.clearQueue = this.clearQueue.bind(this);
         
     }
     
@@ -83,6 +84,16 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
 
     openModal(){
         this.setState({openedModal:true});
+    }
+
+    pauseQueue(){
+
+    }
+
+    clearQueue(){
+        this.setState({commandsToSend: []});
+        new Command2Send(AviableCommands[2]).send();
+        alert("Очередь очищена");
     }
 
     change(event:any,index:number){
@@ -148,8 +159,11 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
                     <div className="queue-list-header">
                         Очередь комманд:    
                     </div>
-                    <div className="clear-queue">
+                    <div className="clear-queue" onClick = {this.clearQueue}>
                         Очистить очередь
+                    </div>
+                    <div className="clear-queue pause" onClick = {this.pauseQueue}>
+                        Поставить на паузу
                     </div>
                     <div className="queue-list-queue">
                         {this.state.queue.data.map((task : Task) => 
@@ -166,14 +180,9 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
                     </div>
                     <div className="commads-list">
                         <div className="button-blue cmd-btn" onClick={this.openModal}>
-                            Вперед
+                            Добавить
                         </div>
-                        <div className="button-blue cmd-btn">
-                            Назад
-                        </div>
-                        <div className="button-blue cmd-btn">
-                            Поворот
-                        </div>
+
                     </div>
                 </div>
             </div>

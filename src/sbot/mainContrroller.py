@@ -3,7 +3,7 @@ import struct
 import serial
 from time import sleep
 import config
-from classes import TodoTask,ServoController,ActiveTask
+from classes import TodoTask,ServoController,ActiveTask,Point
 import threading
 import robotTasks
 from splusbot import SPlusBot
@@ -41,8 +41,11 @@ commands = {
     '04' : rotateRightTask,
     '05' : servoRotateHorizontalTask,
     '06' : servoRotateVerticalTask,
-    '07' : dropFlagTask
+    '07' : dropFlagTask,
 }
+
+m2p_x = 0.001
+m2p_y = 0.001
 
 
 bot = SPlusBot()
@@ -52,7 +55,7 @@ def set_q():
 
 def parse_packages(*packages):
 
-    global queue,activeTask
+    global queue,activeTask,m2p_x,m2p_y
     
     for package in packages:
 
@@ -74,7 +77,15 @@ def parse_packages(*packages):
             if command == config.PAUSE_COMMAND_NAME:
                 activeTask.task.pause()
                 continue
-
+            if command == config.M2P_SET_X:
+                m2p_x = int(v1 + v2,16) / 100
+                continue
+            if command == config.M2P_SET_Y:
+                m2p_y = int(v1 + v2,16) / 100
+                continue
+            if command == config.M2P_SEND:
+                bot.move2point(Point(m2p_x,m2p_y))
+                continue
             if command in commands:
 
                 todoCommand = deepcopy(commands[command])
