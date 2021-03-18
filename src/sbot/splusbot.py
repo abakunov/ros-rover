@@ -115,14 +115,15 @@ class SPlusBot:
     
     def rotate2angle(self, angle : float, speed : float = 0.3):
         
-
+        print(angle,"NEED TO GO HERE")
+        time.sleep(4)
 
         msg = Twist()
         msg.angular.z = speed
         loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
 
         while abs(self.position.theta.toTheta() - angle )>= 1:
-
+            abs(self.position.theta.toTheta() - angle )
             self.velPub.publish(msg)
             loop_rate.sleep()
         
@@ -145,8 +146,9 @@ class SPlusBot:
 
         print("hep",hyp)
         print(x_diff,y_diff)
+        print(abs(np.degrees(np.arctan(y_diff / x_diff))))
 
-        if y_diff < 0:
+        if y_diff <= 0:
             if x_diff < 0:
                 self.rotate2angle(deg, -self.ANGULAR_SPEED)
             else:
@@ -161,7 +163,7 @@ class SPlusBot:
 
         vel_msg = Twist()
         vel_msg.linear.x = self.LINEAR_SPEED
-        rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
+        rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
         while abs(self.position - point) >= 0.02:
             print(abs(self.position - point))
             self.velPub.publish(vel_msg)
@@ -183,3 +185,4 @@ class SPlusBot:
     def turnOffLed(self):
         self.led.turn_off()
         
+    
