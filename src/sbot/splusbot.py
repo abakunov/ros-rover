@@ -16,12 +16,44 @@ class SPlusBot:
 
     #обновление координат робота
     def positionCallback(self,data : Odometry) -> None:
+
+        if (self.predPosition == Position(QuantPos(), -1 , -1)):
+
+            self.predPosition = self.position
+
+            self.position.x = data.pose.pose.position.x
+            self.position.y = data.pose.pose.position.y
+            self.position.theta.z = data.pose.pose.orientation.z
+            self.position.theta.x = data.pose.pose.orientation.x
+            self.position.theta.y = data.pose.pose.orientation.y
+            self.position.theta.w = data.pose.pose.orientation.w
+
+            return 
+        
+        dx = data.pose.pose.position.x - self.predPosition.x
+        dy = data.pose.pose.position.y - self.predPosition.y
+        
+        #TODO implement getting alpha value
+
+        alpha = 1
+
+        dx *= alpha
+        dy *= alpha
+
+        self.position.x += dx
+        slef.position.y += dy
+
+                        
+        self.predPosition = self.position 
+
         self.position.x = data.pose.pose.position.x
         self.position.y = data.pose.pose.position.y
         self.position.theta.z = data.pose.pose.orientation.z
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
         self.position.theta.w = data.pose.pose.orientation.w
+        #test print
+        print(quaternion_to_euler(data.pose.orientation))
         #print(self.position.theta.toTheta())
 
     def _getCurrentLocation(self) -> None:
@@ -49,6 +81,8 @@ class SPlusBot:
         self.LINEAR_SPEED = config.DEFAULT_SPEED
         
         self.ANGULAR_SPEED = config.DEFAULT_ANGULAR_SPEED
+
+        self.predPosition = Position(QuantPos(), -1 , -1)
         
 
         self._getCurrentLocation()
