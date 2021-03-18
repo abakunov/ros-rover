@@ -146,18 +146,18 @@ class SPlusBot:
         print("hep",hyp)
         print(x_diff,y_diff)
 
-        
+        print("deg:",np.degrees(np.arctan(y_diff / x_diff)))
 
 
         if y_diff < 0:
             if x_diff < 0:
                 print(deg)
                 
-                self.rotate2angle(deg, -self.ANGULAR_SPEED)
+                self.rotate2angle(deg, self.ANGULAR_SPEED)
             else:
                 print(90 + deg)
                 
-                self.rotate2angle(90 + deg, self.ANGULAR_SPEED)
+                self.rotate2angle((deg +180)%360, -self.ANGULAR_SPEED)
         else:
             if x_diff < 0:
                 print(deg)
@@ -166,7 +166,7 @@ class SPlusBot:
             else:
                 print(deg + 90)
                 
-                self.rotate2angle(deg + 90, -self.ANGULAR_SPEED)
+                self.rotate2angle((deg + 90)%360, -self.ANGULAR_SPEED)
         
         time.sleep(10)
 
