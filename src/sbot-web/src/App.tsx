@@ -10,44 +10,61 @@ enum ActivePage {
   Panel
 }
 
-interface AppState{
-  activePage : ActivePage,
-  port : string,
+interface AppState {
+  activePage: ActivePage,
+  port: string,
 }
 
-class App extends React.Component<{},AppState>{
+class App extends React.Component<{}, AppState>{
 
-  constructor(props : AppState) {
+  constructor(props: AppState) {
     super(props);
     this.state = {
-      activePage : ActivePage.Modal,
-      port : ""
+      activePage: ActivePage.Modal,
+      port: ""
     };
+
+    this.navigateToMain = this.navigateToMain.bind(this);
   }
 
-  toggleClickHandler = () : void =>{
+  toggleClickHandler = (): void => {
     return
   }
 
-  choosePort = (newPort:string):void=>{
+  choosePort = (newPort: string): void => {
     this.setState({
-      port : newPort,
-      activePage : ActivePage.Panel
+      port: newPort,
     });
   }
 
-  public render(){
+  navigateToMain = (event: any): void => {
+    const data = { port: this.state.port };
+    console.log(data);
+    
+    //POST request with body equal on data in JSON format
+    fetch('http://0.0.0.0:5000/set_serial_port', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    })
+
+
+    this.setState({
+      activePage: ActivePage.Panel,
+    });
+  }
+
+  public render() {
     return (
       <div>
-        
-        <NavBar gotoSettings = {this.toggleClickHandler} commandsInQueue = {3}></NavBar>
+
+        <NavBar gotoSettings={this.toggleClickHandler} commandsInQueue={3}></NavBar>
 
         {
-          this.state.activePage == ActivePage.Modal ? <ChoosePortModal choosePort = {this.choosePort}></ChoosePortModal>:
-          <Pallete port={this.state.port}/>
+          this.state.activePage == ActivePage.Modal ? <ChoosePortModal apply={this.navigateToMain} choosePort={this.choosePort}></ChoosePortModal> :
+            <Pallete port={this.state.port} />
         }
 
-        
+
       </div>
     )
   }

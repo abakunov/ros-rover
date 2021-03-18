@@ -9,6 +9,7 @@ interface choosePortModalState {
 
 interface choosePortModalProps {
     choosePort: (arg0 : string) => void;
+    apply : any;
 }
 
 
@@ -31,11 +32,22 @@ export class ChoosePortModal extends React.Component<choosePortModalProps, choos
         this.setState({
             ports: response_json['ports']
         });
+
+        if (response_json['ports'].length>0){
+            
+           this.setState({
+            port : response_json['ports'][0]
+           });
+           this.props.choosePort(this.state.port);
+           
+           
+        }
     }
     change(event: any ) {
         this.setState({
             port : event.target.value
         });
+        this.props.choosePort(event.target.value);
     }
 
     changeGlobal(event : any){
@@ -58,7 +70,7 @@ export class ChoosePortModal extends React.Component<choosePortModalProps, choos
                             return (<option>{port}</option>)
                         })}
                     </select>
-                    <div className="modal-apply-button" onClick = {this.changeGlobal}>
+                    <div className="modal-apply-button" onClick = {(event)=>this.props.apply(event)}>
                         Apply
                     </div>
                 </div>
