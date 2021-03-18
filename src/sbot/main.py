@@ -31,7 +31,18 @@ def move2point(p1:Point, point : Point):
     
 
     deg = abs(np.degrees(np.arctan(y_diff / x_diff)))
-    print(x_diff, y_diff)
-    print(deg)
 
-move2point(Point(0,0), Point(-1,1))
+    if y_diff < 0:
+            if x_diff < 0:
+                print(deg,"+")
+            else:
+                print(360 - deg,"-")
+    else:
+            if x_diff < 0:
+                print((90 + deg)%360,"+")
+
+            else:
+                print((180 + deg)%360,"-")
+
+
+move2point(Point(0,0), Point(1,-1))
