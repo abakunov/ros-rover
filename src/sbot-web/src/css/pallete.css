@@ -110,8 +110,66 @@
 }
 
 .add-command-to-send{
-    margin-top: 3vh;
+margin-top: 3vh;
  width: 20vw;
  height:5vh;
  background-color:#3C40C6;   
+ color:#fff;
+ font-weight: bold;
+ font-size: 2rem;
+ text-align: center;
+ border-radius: 20px;
+ padding-top: 1vh;
+}
+
+.t2s-param{
+    
+    color : black;
+    font-weight: bold;
+    font-size: 2rem;
+    margin-bottom: 1vh;
+    margin-right: 3vw;
+}
+
+.param-add{
+    width:80%;
+    margin-top: 2vh;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.t2s-value{
+    font-size: 1.5rem;
+    border-radius: 20px;
+}
+
+
+.button-red-modal{
+    color: #fff;
+    background: red;
+    border-radius: 14px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 2rem;
+    padding: 10px 16px;
+    max-width: 10vw;
+    margin-top: 3vh;
+    text-align: center;
+}
+
+.send-commads{
+    color: #fff;
+    background: green;
+    border-radius: 14px;
+    font-style: normal;
+    font-weight: bold;
+    font-size: 2rem;
+    padding: 10px 16px;
+    max-width: 10vw;
+    margin-top: 3vh;
+    text-align: center;
+    cursor: pointer;
 }

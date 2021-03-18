@@ -10,6 +10,7 @@ import { Command } from '../interfaces/Command';
 import AviableCommands from '../aviableCommands';
 import { Command2Send } from '../models/Command2Send';
 import { CommandToSend } from './taskToSend';
+const R = require('ramda');
 
 interface PalleteState{
     port : string;
@@ -27,7 +28,7 @@ const customStyles = {
       left                  : '50%',
       right                 : 'auto',
       width                 : '50%',
-      height                : '50%',
+      height                : '70%',
       bottom                : 'auto',
       marginRight           : '-50%',
       borderRadius          : '30px',
@@ -49,7 +50,22 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
         this.closeModal = this.closeModal.bind(this);
         this.change = this.change.bind(this);
         this.addCommand2Send = this.addCommand2Send.bind(this);
+        this.delcmd = this.delcmd.bind(this);
+        this.sendCommads = this.sendCommads.bind(this);
+        this.updateVal = this.updateVal.bind(this);
         
+    }
+    
+    updateVal(index : number, event:any) {
+        this.state.commandsToSend[index].command.propValue = event.target.value;
+        this.setState({commandsToSend : this.state.commandsToSend});
+    }
+
+    sendCommads(){
+        this.state.commandsToSend.forEach(command => {
+            command.send();
+        });
+        this.setState({commandsToSend:[]});
     }
 
     componentDidMount(){
@@ -69,13 +85,30 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
         this.setState({openedModal:true});
     }
 
-    change(){
+    change(event:any,index:number){
+        this.state.commandsToSend[index].command = AviableCommands[event.target.value];
+        this.setState({
+            commandsToSend: this.state.commandsToSend
+        })
+    }
+
+    delcmd(index:number){
+        this.state.commandsToSend.splice(index, 1);
+        let n_one = R.clone(this.state.commandsToSend);
+        console.log(n_one[1]);
+        
+        this.setState({commandsToSend: []});
+        this.setState({commandsToSend: [...n_one]});
+        console.log(this.state.commandsToSend);
         
     }
+
+    
 
     addCommand2Send(){
         this.state.commandsToSend.push(new Command2Send(AviableCommands[0]));
         this.setState({commandsToSend: this.state.commandsToSend});
+        
     }
 
     render(){
@@ -92,9 +125,21 @@ export class Pallete extends React.Component<PalleteProps , PalleteState> {
                 <div className="send-modal-header">
                     Отослать новые команды
                 </div>
-                {this.state.commandsToSend.map((command,i) => <CommandToSend></CommandToSend>)}
+                {this.state.commandsToSend.map((command,i) => 
+                <CommandToSend
+                key={i}
+                del={this.delcmd}
+                command={command}
+                updateVal = {this.updateVal}
+                index={i}
+                change = {this.change}></CommandToSend>)}
+
                 <div className="add-command-to-send" onClick={this.addCommand2Send}>
                     +
+                </div>
+
+                <div className="send-commads" onClick={this.sendCommads}>
+                    Отправить
                 </div>
             </div>
             </Modal>

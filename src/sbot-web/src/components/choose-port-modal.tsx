@@ -21,9 +21,15 @@ export class ChoosePortModal extends React.Component<choosePortModalProps, choos
         this.changeGlobal = this.changeGlobal.bind(this);
     }
 
-    getPorts() {
+    async getPorts()  {
+        let url = 'http://0.0.0.0:5000/get_serial_ports';
+        let response = await fetch(url);
+        let response_json = await response.json();
+     
+        console.log(response_json['ports']);
+        
         this.setState({
-            ports: ["test/1", "test/2"]
+            ports: response_json['ports']
         });
     }
     change(event: any ) {
