@@ -22,6 +22,7 @@ from setAngularSpeedTask import setAngularTask
 from rotateLeftTask import rotateLeftTask
 from rotateRightTask import rotateRightTask
 from ledtasks import ledOnTask,ledOffTask
+from dropTheFlagTask import dropFlagTask
 
 
 queue = []
@@ -39,7 +40,8 @@ commands = {
     '03' : rotateLeftTask, 
     '04' : rotateRightTask,
     '05' : servoRotateHorizontalTask,
-    '06' : servoRotateVerticalTask
+    '06' : servoRotateVerticalTask,
+    '07' : dropFlagTask
 }
 
 

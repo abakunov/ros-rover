@@ -3,7 +3,7 @@ import math
 import threading
 import sys
 import trace
-from config import VERTICAL_SERVO_TOPIC_NAME, HORIZONTAL_SERVO_TOPIC_NAME, LED_TOPIC_NAME
+from config import VERTICAL_SERVO_TOPIC_NAME, HORIZONTAL_SERVO_TOPIC_NAME, LED_TOPIC_NAME,DROP_TOPIC_NAME
 import rospy
 from std_msgs.msg import UInt16
 
@@ -161,12 +161,15 @@ class ServoController:
     def __init__(self):
         self.pub1 = rospy.Publisher(HORIZONTAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
         self.pub2 = rospy.Publisher(VERTICAL_SERVO_TOPIC_NAME, UInt16, queue_size=10)
-
+        self.dropPub = rospy.Publisher(DROP_TOPIC_NAME, UInt16, queue_size = 10)
     def moveHorizontal(self,deg:int):
         self.pub1.publish(deg)
     
     def moveVertical(self,deg:int):
         self.pub2.publish(deg)
+
+    def dropFlag(self):
+        self.dropPub.publish(0)
 
 class LedController:
 
@@ -176,4 +179,4 @@ class LedController:
         self.pub.publish(1) 
     
     def turn_off(self):
-        self.pub.publish(0)
+        self.pub.publish(0) 

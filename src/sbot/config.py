@@ -6,6 +6,7 @@ ODOM_TOPIC_NAME = "odom"
 HORIZONTAL_SERVO_TOPIC_NAME = "horizontal_servo"
 VERTICAL_SERVO_TOPIC_NAME = "vertical_servo"
 LED_TOPIC_NAME = "led_controller"
+DROP_TOPIC_NAME = "drop_flag"
 
 #CONSTANTS
 

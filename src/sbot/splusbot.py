@@ -53,7 +53,7 @@ class SPlusBot:
         self.position.theta.y = data.pose.pose.orientation.y
         self.position.theta.w = data.pose.pose.orientation.w
         #test print
-        print(quaternion_to_euler(data.pose.orientation))
+        #print(quaternion_to_euler(data.pose.orientation))
         #print(self.position.theta.toTheta())
 
     def _getCurrentLocation(self) -> None:
@@ -188,7 +188,7 @@ class SPlusBot:
             self.velPub.publish(vel_msg)
             rate.sleep()
         
-        bot.stop()
+        self.stop()
 
 
     def servoRotateHorizontal(self, angle : int):
@@ -200,6 +200,9 @@ class SPlusBot:
 
     def turnOnLed(self):
         self.led.turn_on()
+
+    def dropTheFlag(self):
+        self.servo.dropFlag()
     
     def turnOffLed(self):
         self.led.turn_off()
