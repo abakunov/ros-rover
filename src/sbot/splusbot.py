@@ -135,25 +135,25 @@ class SPlusBot:
     def move2point(self, point : Point):
         
         bot_pos = self.position
-        
-        hyp = self.position - point
-        
+
+        deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
+        current = 0
+
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
-        deg = (getDeg((0,10),(point.x - self.position.x, point.y - self.position.y)) + self.position.theta.toTheta()) % 360
-        
-
         if y_diff <= 0:
-            if x_diff < 0:
-                self.rotate2angle(deg, -self.ANGULAR_SPEED)
-            else:
-                self.rotate2angle(deg, self.ANGULAR_SPEED)
+                if x_diff <= 0:
+                    deg = (current + deg) % 360
+                else:
+                    deg = (current - deg) % 360
         else:
-            if x_diff < 0:
-                self.rotate2angle(deg -self.ANGULAR_SPEED)
-            else:
-                self.rotate2angle(deg, self.ANGULAR_SPEED)
+                if x_diff < 0:
+                    deg = (current + deg) % 360
+                else:
+                    deg = (current - deg) % 360
+        
+        self.rotate2angle(deg)
         
         time.sleep(10)
 
