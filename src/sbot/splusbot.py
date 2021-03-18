@@ -5,7 +5,7 @@ import numpy as np
 
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
-
+from geometryHelpers import getDeg
 from classes import Point,Position,QuantPos, ServoController, LedController
 
 from copy import deepcopy
@@ -116,17 +116,18 @@ class SPlusBot:
     def rotate2angle(self, angle : float, speed : float = 0.3):
         
         print(angle,"NEED TO GO HERE")
-        time.sleep(4)
+        
 
         msg = Twist()
         msg.angular.z = speed
+        print(speed)
         loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
-
+        print(0)
         while abs(self.position.theta.toTheta() - angle )>= 1:
             abs(self.position.theta.toTheta() - angle )
             self.velPub.publish(msg)
             loop_rate.sleep()
-        
+        print(0)
         self.stop()
 
         
@@ -140,24 +141,19 @@ class SPlusBot:
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
-        deg = (abs(np.degrees(np.arctan(y_diff / x_diff))) + self.position.theta.toTheta()) % 360
+        deg = (getDeg((0,10),(point.x - self.position.x, point.y - self.position.y)) + self.position.theta.toTheta()) % 360
         
-        print("START POINT:", self.position)
-
-        print("hep",hyp)
-        print(x_diff,y_diff)
-        print(abs(np.degrees(np.arctan(y_diff / x_diff))))
 
         if y_diff <= 0:
             if x_diff < 0:
                 self.rotate2angle(deg, -self.ANGULAR_SPEED)
             else:
-                self.rotate2angle(360 - deg, self.ANGULAR_SPEED)
+                self.rotate2angle(deg, self.ANGULAR_SPEED)
         else:
             if x_diff < 0:
-                self.rotate2angle((90 + deg)%360, -self.ANGULAR_SPEED)
+                self.rotate2angle(deg -self.ANGULAR_SPEED)
             else:
-                self.rotate2angle((180 + deg)%360, self.ANGULAR_SPEED)
+                self.rotate2angle(deg, self.ANGULAR_SPEED)
         
         time.sleep(10)
 
