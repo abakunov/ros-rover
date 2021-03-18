@@ -115,11 +115,12 @@ def worker():
 def reciving_data():
     global queue,activeTask
     while True:
-        
         received_data = ser.read()              
         sleep(0.03)
         data_left = ser.inWaiting()             
         received_data += ser.read(data_left)
+        print(received_data)
+        
         parse_packages(received_data)
         print(queue)
         #ser.write(b'Command recived \n')
