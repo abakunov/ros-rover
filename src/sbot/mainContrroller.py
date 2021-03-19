@@ -8,6 +8,7 @@ import threading
 import robotTasks
 from splusbot import SPlusBot
 from copy import deepcopy
+from sensor_msgs.msg import CompressedImage
 import rospy
 
 import sys
@@ -22,8 +23,9 @@ from setAngularSpeedTask import setAngularTask
 from rotateLeftTask import rotateLeftTask
 from rotateRightTask import rotateRightTask
 from ledtasks import ledOnTask,ledOffTask
-from dropTheFlagTask import dropFlagTask
-
+from dropTheFlagTask import dropTheFlagTask
+from move2PointTask import MoveToPointTask
+from sendCameraTask import senPictureFromCamTask
 
 queue = []
 activeTask = ActiveTask(None)
@@ -41,7 +43,9 @@ commands = {
     '04' : rotateRightTask,
     '05' : servoRotateHorizontalTask,
     '06' : servoRotateVerticalTask,
-    '07' : dropFlagTask,
+    '07' : dropTheFlagTask,
+    'c3' : MoveToPointTask,
+    'ba' : senPictureFromCamTask
 }
 
 m2p_x = 0.001
@@ -68,7 +72,7 @@ def parse_packages(*packages):
             
             command, v1, v2 = arr_b[i] , arr_b[i + 1], arr_b[i + 2]
             command = command.hex()
-            v1 = v1.hex()
+            v1 = v1.hex() 
             v2 = v2.hex()
 
             if command == config.STOP_COMMAND_NAME:
@@ -85,13 +89,12 @@ def parse_packages(*packages):
                 continue
             if command == config.M2P_SEND:
                 bot.move2point(Point(m2p_x,m2p_y))
+                todoCommand = deepcopy(commands[command])
+                todoCommand.params = [m2p_x,m2p_y]
                 continue
             if command in commands:
 
                 todoCommand = deepcopy(commands[command])
-
-
-
                 todoCommand.params = [v1,v2]
                 queue.append(todoCommand)
 

@@ -3,6 +3,8 @@ import config
 import time
 import numpy as np
 
+
+from sensor_msgs.msg import CompressedImage
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
 from geometryHelpers import getDeg
@@ -17,37 +19,11 @@ class SPlusBot:
     #обновление координат робота
     def positionCallback(self,data : Odometry) -> None:
 
-        if (self.predPosition == Position(QuantPos(), -1 , -1)):
 
-            self.predPosition = self.position
-
-            self.position.x = data.pose.pose.position.x
-            self.position.y = data.pose.pose.position.y
-            self.position.theta.z = data.pose.pose.orientation.z
-            self.position.theta.x = data.pose.pose.orientation.x
-            self.position.theta.y = data.pose.pose.orientation.y
-            self.position.theta.w = data.pose.pose.orientation.w
-
-            return 
         
-        dx = data.pose.pose.position.x - self.predPosition.x
-        dy = data.pose.pose.position.y - self.predPosition.y
-        
-        #TODO implement getting alpha value
 
-        alpha = 1
-
-        dx *= alpha
-        dy *= alpha
-
-        self.position.x += dx
-        slef.position.y += dy
-
-                        
-        self.predPosition = self.position 
-
-        self.position.x = data.pose.pose.position.x
-        self.position.y = -data.pose.pose.position.y
+        self.position.y = +data.pose.pose.position.x
+        self.position.x = -data.pose.pose.position.y
         self.position.theta.z = data.pose.pose.orientation.z
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
@@ -64,6 +40,8 @@ class SPlusBot:
             
         return
 
+    def camera_callback(self,data):
+        self.camera_data = data.data
     def __init__(self):
         
         rospy.init_node(config.INIT_NODE_NAME)
@@ -84,6 +62,9 @@ class SPlusBot:
 
         self.predPosition = Position(QuantPos(), -1 , -1)
         
+        self.camera_subcriber = rospy.Subscriber('/front_camera/compressed' , CompressedImage, self.camera_callback)
+
+        self.camera_data = []
 
         self._getCurrentLocation()
 
@@ -171,31 +152,33 @@ class SPlusBot:
         bot_pos = self.position
 
         deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
-        current = 0
-
+        current = self.position.theta.toTheta()
+        print("self",self.position.theta.toTheta())
+        print("deg",deg)
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
         if y_diff <= 0:
-                if x_diff <= 0:
-                    deg = (current + deg) % 360
-                else:
-                    deg = (current - deg) % 360
+            if x_diff <= 0:
+                deg = deg % 360
+            else:
+                deg =  360 - deg
         else:
-                if x_diff < 0:
-                    deg = (current + deg) % 360
-                else:
-                    deg = (current - deg) % 360
-        
+            if x_diff < 0:
+                deg = deg % 360
+            else:
+                deg = 360 -deg
+
+
+        #time.sleep(21)
         self.rotate2angle(deg)
         
         time.sleep(10)
 
         vel_msg = Twist()
-        vel_msg.linear.x = self.LINEAR_SPEED
+        vel_msg.linear.x = self.LINEAR_SPEED 
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
-        while abs(self.position - point) >= 0.02:
-            print(abs(self.position - point))
+        while abs(self.position - point) >= 0.1:
             self.velPub.publish(vel_msg)
             rate.sleep()
         
