@@ -152,15 +152,20 @@ class SPlusBot:
         print("deg:",math.degrees(atan2(point2.y - point1.y, point2.x - point1.x)))
         return math.degrees(atan2(point2.y - point1.y, point2.x - point1.x))
     
-    def calculate_ang_vel(self, point):
+    def calculate_ang_vel(self, start, point):
         print("vel:", -0.001 *(self.calculate_angle(self.position, point) - self.position.theta.toTheta()))
         print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
-        return -0.01 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta())
+        if self.calculate_angle(sl)
+        if self.calculate_angle(self.start, point)  < self.position.toTheta():
+            return 0.1
+        else:
+            return -0.1
 
     def move2point(self, point : Point):
         
         bot_pos = self.position
-
+        start_point = deepcopy(bot_pos)
+        
         deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
         current = self.position.theta.toTheta()
         x_diff = (bot_pos.x - point.x)
@@ -187,7 +192,7 @@ class SPlusBot:
         vel_msg.linear.x = self.LINEAR_SPEED 
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
         while abs(self.position - point) >= 0.1:
-            vel_msg.angular.z = self.calculate_ang_vel(point)
+            vel_msg.angular.z = self.calculate_ang_vel(start_point , point)
             self.velPub.publish(vel_msg)
             rate.sleep()
         
