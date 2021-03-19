@@ -18,7 +18,7 @@ bot = SPlusBot()
 #bot.rotate2angle(0)
 
 
-bot.move2point(Point(1,1))
+bot.move2point(Point(0.001,4))
 
 
 bot.calculate_angle(bot.position,Point(1,1))
