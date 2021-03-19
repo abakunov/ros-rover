@@ -1,5 +1,5 @@
-from math import sqrt
-import math
+from math import sqrt,acos
+import math 
 
 #Вычисление расстояния между двумя точками
 def calculate_dist(first , second ) -> float:
@@ -23,6 +23,7 @@ def quaternion_to_theta(quant):
 
     return 180 - abs(res) + 180
 
+
 #перевод из квантерниона в углы эйлера
 def quaternion_to_euler(quant):
 
@@ -45,3 +46,16 @@ def quaternion_to_euler(quant):
         Z = math.degrees(math.atan2(t3, t4))
 
         return X, Y, Z
+
+#cкалярное произведение
+def skalar_mulp(vector1, vector2):
+    #print(vector1,vector2)
+    return vector1[0] * vector2[0] + vector1[1] * vector2[1]
+
+#getD
+def getDeg(vector1,vector2):
+    #print(skalar_mulp(vector1,vector2) )
+    ln1 = sqrt(vector1[0]**2 + vector1[1]**2)
+    ln2 = sqrt(vector2[0]**2 + vector2[1]**2)
+    #print(math.degrees(acos(skalar_mulp(vector1,vector2) / (ln1 * ln2))))
+    return math.degrees(acos(skalar_mulp(vector1,vector2) / (ln1 * ln2)))

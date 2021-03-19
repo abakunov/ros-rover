@@ -5,7 +5,7 @@ import numpy as np
 
 from nav_msgs.msg import Odometry
 from geometry_msgs.msg import Twist
-
+from geometryHelpers import getDeg
 from classes import Point,Position,QuantPos, ServoController, LedController
 
 from copy import deepcopy
@@ -47,7 +47,7 @@ class SPlusBot:
         self.predPosition = self.position 
 
         self.position.x = data.pose.pose.position.x
-        self.position.y = data.pose.pose.position.y
+        self.position.y = -data.pose.pose.position.y
         self.position.theta.z = data.pose.pose.orientation.z
         self.position.theta.x = data.pose.pose.orientation.x
         self.position.theta.y = data.pose.pose.orientation.y
@@ -147,43 +147,54 @@ class SPlusBot:
 
         self.stop()
     
+    def rotate2angle(self, angle : float, speed : float = 0.3):
+        
+        print(angle,"NEED TO GO HERE")
+        
+
+        msg = Twist()
+        msg.angular.z = speed
+        print(speed)
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
+        print(0)
+        while abs(self.position.theta.toTheta() - angle )>= 1:
+            abs(self.position.theta.toTheta() - angle )
+            self.velPub.publish(msg)
+            loop_rate.sleep()
+        print(0)
+        self.stop()
+
+        
+
     def move2point(self, point : Point):
         
         bot_pos = self.position
-        
-        hyp = self.position - point
-        
+
+        deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
+        current = 0
+
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
-        deg = abs(np.degrees(np.arctan(y_diff / x_diff)))
-        
-        print(deg)
-        print(x_diff,y_diff)
-        time.sleep(2)
-
-
-        if y_diff < 0:
-            if x_diff < 0:
-                print(deg)
-                self.rotate(deg, -self.ANGULAR_SPEED)
-            else:
-                print(90 + deg)
-                self.rotate(90 + deg, self.ANGULAR_SPEED)
+        if y_diff <= 0:
+                if x_diff <= 0:
+                    deg = (current + deg) % 360
+                else:
+                    deg = (current - deg) % 360
         else:
-            if x_diff < 0:
-                print(deg)
-                self.rotate(deg, -self.ANGULAR_SPEED)
-            else:
-                print(deg + 90)
-                self.rotate(deg + 90, -self.ANGULAR_SPEED)
+                if x_diff < 0:
+                    deg = (current + deg) % 360
+                else:
+                    deg = (current - deg) % 360
+        
+        self.rotate2angle(deg)
         
         time.sleep(10)
 
         vel_msg = Twist()
         vel_msg.linear.x = self.LINEAR_SPEED
-        rate = rospy.Rate(config.DEFAULT_LOOP_RATE)
-        while abs(self.position - point) >= 0.05:
+        rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
+        while abs(self.position - point) >= 0.02:
             print(abs(self.position - point))
             self.velPub.publish(vel_msg)
             rate.sleep()
@@ -207,3 +218,4 @@ class SPlusBot:
     def turnOffLed(self):
         self.led.turn_off()
         
+    
