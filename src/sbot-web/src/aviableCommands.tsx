@@ -16,6 +16,7 @@ var AviableCommands = [
     new Command("c1" ,"Установить x цели", "x (сантиметры)", "0"),
     new Command("c2" ,"Установить y цели", "y (сантиметры)", "0"),
     new Command("c3" ,"Move to Point", "Любой", "0"),
+    new Command("ba" ,"Фото с камеры", "Любой", "0"),
 
 ];
 
