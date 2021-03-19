@@ -54,6 +54,8 @@ m2p_y = 0.001
 
 bot = SPlusBot()
 
+#bot.rotate2angle(270,0.4)
+
 def set_q():
     q = []
 
@@ -77,6 +79,7 @@ def parse_packages(*packages):
 
             if command == config.STOP_COMMAND_NAME:
                 activeTask.task.stop()
+                bot.stop()
                 continue
             if command == config.PAUSE_COMMAND_NAME:
                 activeTask.task.pause()

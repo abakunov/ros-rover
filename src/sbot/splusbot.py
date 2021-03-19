@@ -2,7 +2,8 @@ import rospy
 import config
 import time
 import numpy as np
-
+from math import atan2
+import math
 
 from sensor_msgs.msg import CompressedImage
 from nav_msgs.msg import Odometry
@@ -11,7 +12,7 @@ from geometryHelpers import getDeg
 from classes import Point,Position,QuantPos, ServoController, LedController
 
 from copy import deepcopy
-
+ 
 class SPlusBot:
 
     position : Position
@@ -145,7 +146,16 @@ class SPlusBot:
         print(0)
         self.stop()
 
-        
+
+    def calculate_angle(self,point1, point2):
+        print("selfdeg",self.position.theta.toTheta())
+        print("deg:",math.degrees(atan2(point2.y - point1.y, point2.x - point1.x)))
+        return math.degrees(atan2(point2.y - point1.y, point2.x - point1.x))
+    
+    def calculate_ang_vel(self, point):
+        print("vel:", -0.001 *(self.calculate_angle(self.position, point) - self.position.theta.toTheta()))
+        print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
+        return -0.01 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta())
 
     def move2point(self, point : Point):
         
@@ -153,8 +163,6 @@ class SPlusBot:
 
         deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
         current = self.position.theta.toTheta()
-        print("self",self.position.theta.toTheta())
-        print("deg",deg)
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
 
@@ -179,6 +187,7 @@ class SPlusBot:
         vel_msg.linear.x = self.LINEAR_SPEED 
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
         while abs(self.position - point) >= 0.1:
+            vel_msg.angular.z = self.calculate_ang_vel(point)
             self.velPub.publish(vel_msg)
             rate.sleep()
         

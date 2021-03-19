@@ -16,7 +16,14 @@ bot = SPlusBot()
 #print(getDeg((0,1) , (goto.x - start.x, goto.y - start.y)))
 #exit(0)
 #bot.rotate2angle(0)
-bot.move2point(Point(-1,0.5))
+
+
+bot.move2point(Point(1,1))
+
+
+bot.calculate_angle(bot.position,Point(1,1))
+
+
 #print("bot have been inited")
 
 #print(bot.position.theta.toTheta())
