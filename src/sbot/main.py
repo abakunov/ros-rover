@@ -1,12 +1,22 @@
 from splusbot import SPlusBot
 from time import sleep
+import time
+import config
+import rospy
 from classes import Position,Point
 import serial
 from geometryHelpers import getDeg
 import numpy as np
  
-#bot = SPlusBot()
+bot = SPlusBot()
 
+
+#start = Point(0.,0.)
+#goto = Point(-1,0.5)
+#print(getDeg((0,1) , (goto.x - start.x, goto.y - start.y)))
+#exit(0)
+#bot.rotate2angle(0)
+bot.move2point(Point(-1,0.5))
 #print("bot have been inited")
 
 #print(bot.position.theta.toTheta())
@@ -25,8 +35,8 @@ import numpy as np
 
 
 
-start = Point(0,0)
-goto = Point(-1,0)
+#start = Point(0,0)
+#goto = Point(-1,0)
 
 def move2point(bot_pos,point):
 
@@ -50,4 +60,5 @@ def move2point(bot_pos,point):
     
     print(deg)
 
-move2point(start,goto)
+#move2point(start,goto)
+

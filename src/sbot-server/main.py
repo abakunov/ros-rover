@@ -1,13 +1,51 @@
 from flask import Flask
 from flask import request
 import serial
+import threading
 import struct
 import serial.tools.list_ports
 from flask_cors import CORS, cross_origin
+import serial
+from time import sleep
+import numpy as np
+import cv2
+image_path = './test.png'
+serial_port = ''
+
+def reciving_data():
+    print(0,"!")
+    global serial_port
+    port = serial_port
+    ser = serial.Serial(port, 19200)
+    recived = b'' 
+    print("in recived")
+    while True:
+        print("in loop")
+        received_data = ser.read()              
+        sleep(0.03)
+        data_left = ser.inWaiting()             
+        received_data += ser.read(data_left)
+        print(received_data)
+        if received_data == b'-1':
+            print("!!!!!!!!!!!!!!!!!11")
+            data_img = np.fromstring(recived,dtype=np.uint8)
+            img = cv2.imdecode(data_img, 1)
+            cv2.imwrite(image_path, img) 
+            return recived
+        recived += received_data
+        
+
+def show_image(data : bytes):
+    data_img = np.fromstring(data,dtype=np.uint8)
+    img = cv2.imdecode(data_img, 1)
+    cv2.imshow('image',img)
+    cv2.waitKey(0)
+
+
 
 app = Flask(__name__)
 cors = CORS(app)
-serial_port = ''
+
 
 @app.route('/get_serial_ports/', methods=['GET'])
 @cross_origin()
@@ -36,8 +74,9 @@ def execute_command ():
         global serial_port
         data = eval(request.get_data().decode('utf-8'))
         command = data['command']
+
         value = data['value']
-        command = eval("b'\\x"+command+"'")
+        
         print(command)
         value = hex(int(value))[2::]
 
@@ -54,9 +93,31 @@ def execute_command ():
         elif len(value) == 4:
             s = "\\x"+value[2:]
             f = "\\x"+value[:3:]
-
-        
-        
+        print("COMMAND",command)
+        if command == 'ba':
+            command = eval("b'\\x"+command+"'")
+            strcuted_data = struct.pack('!3c', command, eval("b'"+f+"'") , eval("b'"+s+"'"))
+            port = serial.Serial(serial_port, 19200)
+            port.setDTR(False)
+            port.write(strcuted_data)
+            port.cancel_write()
+            recived = b''
+            while True:
+                print("in loop")
+                received_data = port.read()              
+                sleep(0.03)
+                data_left = port.inWaiting()             
+                received_data += port.read(data_left)
+                print(received_data)
+                if received_data == b'-1':
+                    print("!!!!!!!!!!!!!!!!!11")
+                    data_img = np.fromstring(recived,dtype=np.uint8)
+                    img = cv2.imdecode(data_img, 1)
+                    cv2.imwrite(image_path, img) 
+                    return  {'status': 'OK'}
+                recived += received_data
+            return {'status': 'OK'}
+        command = eval("b'\\x"+command+"'")
         strcuted_data = struct.pack('!3c', command, eval("b'"+f+"'") , eval("b'"+s+"'"))
         port = serial.Serial(serial_port, 19200)
 
@@ -66,5 +127,21 @@ def execute_command ():
     return {'status': 'Bad Request'}
 
 
-if __name__ == "__main__":
+def FlaskThread():
     app.run(host='0.0.0.0')
+
+
+
+def camera_check():
+    while True:
+        if not serial_port:
+            continue
+        reciving_data()
+    
+
+if __name__ == "__main__":
+    fsk = threading.Thread(target = FlaskThread)
+    
+
+    #cmr.start()
+    fsk.start()
