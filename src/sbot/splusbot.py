@@ -157,9 +157,9 @@ class SPlusBot:
         print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
         
         if self.calculate_angle(start, point)  < self.position.theta.toTheta():
-            return -0.4
+            return -0.05 * abs(self.position.theta.toTheta() - self.calculate_angle(start, point))
         else:
-            return 0.4
+            return 0.05 * abs( self.calculate_angle(start, point) - self.position.theta.toTheta())
 
     def move2point(self, point : Point):
         
