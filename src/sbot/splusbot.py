@@ -4,6 +4,7 @@ import time
 import numpy as np
 from math import atan2
 import math
+import os
 
 from sensor_msgs.msg import CompressedImage
 from nav_msgs.msg import Odometry
@@ -146,7 +147,26 @@ class SPlusBot:
         print(0)
         self.stop()
 
-
+    def nicerotate2angle(self, angle : float,cnts : float = 0.01):
+        msg = Twist()
+        while True:
+            first_val = angle - self.position.theta.toTheta()
+            second_val =  angle + ( 360 - self.position.theta.toTheta())
+            if min(abs(first_val),abs(second_val))<=0.5:
+                break 
+            if abs(first_val) < abs(second_val):
+                if first_val <=0:
+                    msg.angular.z =  cnts * abs(first_val)
+                else:
+                    msg.angular.z = -cnts * abs(first_val)
+            else:
+                if second_val <=0:
+                    msg.angular.z = cnts * abs(second_val)
+                else:
+                    msg.angular.z = -cnts * abs(second_val)
+            self.velPub.publish(msg)
+        self.stop()
+        time.sleep(0.3)
     def calculate_angle(self,bot_pos, point):
         deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
         x_diff = (bot_pos.x - point.x)
@@ -245,6 +265,11 @@ class SPlusBot:
         
         self.servo.moveHorizontal(angle)
     
+    def resetOdom(self):
+        os.system("rosservice call /reset")
+        while abs(self.position - Point(0,0)) >= 1:
+            time.sleep(0.2)
+        
     def servoRotateVertical(self, angle : int):
         self.servo.moveVertical(angle)
 

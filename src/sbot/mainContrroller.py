@@ -60,7 +60,7 @@ bot = SPlusBot()
 #bot.rotate2angle(270,0.4)
 
 def set_q():
-    q = []
+    q = [] 
 
 def parse_packages(*packages):
 
@@ -83,6 +83,9 @@ def parse_packages(*packages):
             if command == config.STOP_COMMAND_NAME:
                 activeTask.task.stop()
                 bot.stop()
+                queue = deepcopy([])
+                sleep(0.2)
+                #TODO add queue = []
                 continue
             if command == config.PAUSE_COMMAND_NAME:
                 activeTask.task.pause()
@@ -126,7 +129,7 @@ def worker():
             
             sleep(0.05)
             continue
-
+        ser.write(b'Starting new command\n')
         activeTask.change(queue[0])
 
         activeTask.task.bot = bot

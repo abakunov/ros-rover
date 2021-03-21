@@ -47,27 +47,72 @@ bot.calculate_angle(bot.position,Point(1,1))
 #start = Point(0,0)
 #goto = Point(-1,0)
 
-def move2point(bot_pos,point):
+def draw_req_1():
+    constant = 1.2
+    bot.resetOdom()
+    bot.move2point(Point(0 * constant, 3 * constant))
+    bot.rotate2angle(0)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.rotate2angle(135)
+    bot.resetOdom()
+    bot.move2point(Point(3 * constant , 3 * constant))
+    bot.dropTheFlag()
+    sleep(10)
+    bot.rotate2angle(90)
+    bot.resetOdom()
+    bot.move2point(Point(3 * constant , 3 * constant))
+    bot.dropTheFlag()
+    sleep(10)
+    bot.rotate2angle(135)
+    bot.move_forward(2, velocity = -0.3)
 
-
-    deg = getDeg((0,1) , (goto.x - start.x, goto.y - start.y))
-    current = 0
-
-    x_diff = (bot_pos.x - point.x)
-    y_diff = (bot_pos.y - point.y)
-
-    if y_diff <= 0:
-            if x_diff <= 0:
-                deg = (current + deg) % 360
-            else:
-                deg = (current - deg) % 360
-    else:
-            if x_diff < 0:
-                deg = (current + deg) % 360
-            else:
-                deg = (current - deg) % 360
+def draw_req_2():
+    constant = 1.2
+    bot.resetOdom()
+    bot.move2point(Point(0 * constant, 3 * constant))
+    bot.rotate2angle(0)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move2point(Point(0,0))
+    bot.rotate2angle(90)
+    bot.resetOdom()
+    bot.move2point(Point(0 * constant, 3 * constant))
+    bot.rotate2angle(0)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move2point(Point(0,0))
+    bot.rotate2angle(90)
+    bot.resetOdom()
+    bot.move2point(Point(0 * constant, 3 * constant))
+    bot.rotate2angle(0)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move2point(Point(0,0))
+    bot.rotate2angle(90)
     
-    print(deg)
+
+def draw_req_no_m2p():
+    constant = 1.2
+    bot.resetOdom()
+    bot.move_forward(3 * constant)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move_forward(3 * constant, velocity = -0.3)
+    bot.rotate2angle(90)
+    bot.resetOdom()
+    bot.move_forward(3 * constant)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move_forward(3 * constant, velocity = -0.3)
+    bot.rotate2angle(90)
+    bot.resetOdom()
+    bot.move_forward(3 * constant)
+    bot.dropTheFlag()
+    sleep(10)
+    bot.move_forward(3 * constant, velocity = -0.3)
+    bot.rotate2angle(90)
+
 
 #move2point(start,goto)
 
