@@ -16,9 +16,11 @@ bot = SPlusBot()
 #print(getDeg((0,1) , (goto.x - start.x, goto.y - start.y)))
 #exit(0)
 #bot.rotate2angle(0)
+while False:
+    print(bot.calculate_ang_vel(bot.position, Point(0,5)))
+    time.sleep(1)
 
-
-bot.move2point(Point(0.001,4))
+bot.move2point(Point(2,3))
 
 
 bot.calculate_angle(bot.position,Point(1,1))

@@ -10,6 +10,7 @@ from splusbot import SPlusBot
 from copy import deepcopy
 from sensor_msgs.msg import CompressedImage
 import rospy
+import rosservice
 
 import sys
 
@@ -26,7 +27,8 @@ from ledtasks import ledOnTask,ledOffTask
 from dropTheFlagTask import dropTheFlagTask
 from move2PointTask import MoveToPointTask
 from sendCameraTask import senPictureFromCamTask
-
+from rotate2angle import Rotate2Task
+import os
 queue = []
 activeTask = ActiveTask(None)
 SERVO = ServoController()
@@ -45,7 +47,8 @@ commands = {
     '06' : servoRotateVerticalTask,
     '07' : dropTheFlagTask,
     'c3' : MoveToPointTask,
-    'ba' : senPictureFromCamTask
+    'ba' : senPictureFromCamTask,
+    'de' : Rotate2Task
 }
 
 m2p_x = 0.001
@@ -90,21 +93,24 @@ def parse_packages(*packages):
             if command == config.M2P_SET_Y:
                 m2p_y = int(v1 + v2,16) / 100
                 continue
+            if command == 'ff':
+                os.system("rosservice call /reset")
+                continue
             if command == config.M2P_SEND:
                 bot.move2point(Point(m2p_x,m2p_y))
                 todoCommand = deepcopy(commands[command])
-                todoCommand.params = [m2p_x,m2p_y]
+                todoCommand.params = deepcopy([m2p_x,m2p_y])
                 continue
             if command in commands:
 
                 todoCommand = deepcopy(commands[command])
-                todoCommand.params = [v1,v2]
+                todoCommand.params = deepcopy([v1,v2])
                 queue.append(todoCommand)
 
 
 
 ser = serial.Serial(config.SERIAL_PORT, 19200)
-
+ser.setDTR(False)
 
 def worker():
     
@@ -135,14 +141,17 @@ def reciving_data():
     global queue,activeTask
     while True:
         received_data = ser.read()              
+        
         sleep(0.03)
         data_left = ser.inWaiting()             
         received_data += ser.read(data_left)
-        print(received_data)
+        print(received_data,"!")
         
         parse_packages(received_data)
         print(queue)
-        #ser.write(b'Command recived \n')
+        if received_data != b'\\xba\\xaa\\xaa':
+            print('!')
+            ser.write(b'Command recived\n')
 
 
 def main():

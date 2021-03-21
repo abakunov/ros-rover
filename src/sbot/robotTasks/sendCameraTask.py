@@ -23,8 +23,7 @@ def send_data(data):
         time.sleep(0.5)
     print("Exiting")
     time.sleep(10)
-    ser.write(b'-1')
-    rospy.loginfo("The end of file upload")
+    
 
 
 def CameraTaskDone(**kwargs):

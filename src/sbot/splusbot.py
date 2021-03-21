@@ -147,25 +147,57 @@ class SPlusBot:
         self.stop()
 
 
-    def calculate_angle(self,point1, point2):
-        print("selfdeg",self.position.theta.toTheta())
-        print("deg:",math.degrees(atan2(point2.y - point1.y, point2.x - point1.x)))
-        return math.degrees(atan2(point2.y - point1.y, point2.x - point1.x))
-    
-    def calculate_ang_vel(self, start, point):
-        print("vel:", -0.001 *(self.calculate_angle(self.position, point) - self.position.theta.toTheta()))
-        print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
-        
-        if self.calculate_angle(start, point)  < self.position.theta.toTheta():
-            return -0.4
+    def calculate_angle(self,bot_pos, point):
+        deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
+        x_diff = (bot_pos.x - point.x)
+        y_diff = (bot_pos.y - point.y)
+
+        if y_diff <= 0:
+            if x_diff <= 0:
+                deg = deg % 360
+            else:
+                deg =  360 - deg
         else:
-            return 0.4
+            if x_diff < 0:
+                deg = deg % 360
+            else:
+                deg = 360 -deg
+        return deg
+    
+    def calculate_ang_vel(self, start, point, cnts = 0.01):
+        #print("vel:", -0.001 *(self.calculate_angle(self.position, point) - self.position.theta.toTheta()))
+        #print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
+        first_val = self.calculate_angle(self.position, point) - self.position.theta.toTheta()
+        second_val =  self.calculate_angle(self.position, point) + ( 360 - self.position.theta.toTheta())
+        if min(abs(first_val),abs(second_val))<=1:
+            return 0
+        if abs(first_val) < abs(second_val):
+            if first_val <=0:
+                return cnts * abs(first_val)
+            else:
+                return -cnts * abs(first_val)
+        else:
+            if second_val <=0:
+                return cnts * abs(second_val)
+            else:
+                return -cnts * abs(second_val)
+        print(first_val, second_val)
+        print(self.calculate_angle(self.position, point),"calculated")
+        print(self.position.theta.toTheta())
+        print()
+        return 0
+        if abs(self.position.theta.toTheta() - self.calculate_angle(self.position, point)) <=2  :
+            return 0.0
+        if self.calculate_angle(self.position, point)  < self.position.theta.toTheta():
+            return -0.002 * abs(self.position.theta.toTheta() - self.calculate_angle(self.position, point))
+        else:
+            return 0.002 * abs( self.calculate_angle(self.position, point) - self.position.theta.toTheta())
 
     def move2point(self, point : Point):
         
         bot_pos = self.position
         start_point = deepcopy(bot_pos)
-        
+        last_point = deepcopy(start_point)
         deg = getDeg((0,1) , (point.x - bot_pos.x, point.y - bot_pos.y))
         current = self.position.theta.toTheta()
         x_diff = (bot_pos.x - point.x)
@@ -187,12 +219,22 @@ class SPlusBot:
         self.rotate2angle(deg)
         
         time.sleep(10)
+        
 
         vel_msg = Twist()
-        vel_msg.linear.x = self.LINEAR_SPEED 
+        vel_msg.linear.x = self.LINEAR_SPEED  
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
         while abs(self.position - point) >= 0.1:
-            vel_msg.angular.z = self.calculate_ang_vel(start_point , point)
+            if abs(last_point - self.position)  >=  abs(start_point - point) / 4:
+                sss = Twist()
+                sss.linear.x = 0
+                while self.calculate_ang_vel(start_point , point) != 0:
+                    sss.angular.z = self.calculate_ang_vel(start_point , point)
+                    self.velPub.publish(sss)
+                self.stop()
+                 
+                last_point = deepcopy(start_point)
+            
             self.velPub.publish(vel_msg)
             rate.sleep()
         
