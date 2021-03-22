@@ -20,10 +20,10 @@ while False:
     print(bot.calculate_ang_vel(bot.position, Point(0,5)))
     time.sleep(1)
 
-bot.move2point(Point(2,3))
+#bot.move2point(Point(2,3))
 
 
-bot.calculate_angle(bot.position,Point(1,1))
+#bot.calculate_angle(bot.position,Point(1,1))
 
 
 #print("bot have been inited")
@@ -50,21 +50,19 @@ bot.calculate_angle(bot.position,Point(1,1))
 def draw_req_1():
     constant = 1.2
     bot.resetOdom()
-    bot.move2point(Point(0 * constant, 3 * constant))
-    bot.rotate2angle(0)
+    bot.move2point(Point(1.5 * constant, 1.5 * constant))
+
     bot.dropTheFlag()
     sleep(10)
-    bot.rotate2angle(135)
-    bot.resetOdom()
-    bot.move2point(Point(3 * constant , 3 * constant))
+    bot.move2point(Point(1.5 * constant , -1.5 * constant))
     bot.dropTheFlag()
     sleep(10)
-    bot.rotate2angle(90)
-    bot.resetOdom()
-    bot.move2point(Point(3 * constant , 3 * constant))
+    bot.move2point(Point(-1.5 * constant , -1.5 * constant))
     bot.dropTheFlag()
     sleep(10)
-    bot.rotate2angle(135)
+    bot.move2point(Point(-1.5 * constant , 1.5 * constant))
+    bot.dropTheFlag()
+    sleep(10)
     bot.move_forward(2, velocity = -0.3)
 
 def draw_req_2():
@@ -116,3 +114,6 @@ def draw_req_no_m2p():
 
 #move2point(start,goto)
 
+#draw_req_1()
+
+bot.move2point(Point(1.5,1.5))

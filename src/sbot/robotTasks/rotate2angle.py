@@ -12,7 +12,7 @@ def Rotate2(params,**kwargs):
     val2 = params[1]
     deg = int(val1 + val2,16) 
 
-    bot.rotate2angle(deg)
+    bot.nicerotate2angle(deg) 
 
 def cancelRotate2(**kwargs):
     bot = kwargs.get('bot')

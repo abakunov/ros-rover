@@ -28,6 +28,8 @@ from dropTheFlagTask import dropTheFlagTask
 from move2PointTask import MoveToPointTask
 from sendCameraTask import senPictureFromCamTask
 from rotate2angle import Rotate2Task
+from drawRecTask import drawRectTask
+
 import os
 queue = []
 activeTask = ActiveTask(None)
@@ -48,7 +50,8 @@ commands = {
     '07' : dropTheFlagTask,
     'c3' : MoveToPointTask,
     'ba' : senPictureFromCamTask,
-    'de' : Rotate2Task
+    'de' : Rotate2Task,
+    'e7' : drawRectTask
 }
 
 m2p_x = 0.001
@@ -81,7 +84,10 @@ def parse_packages(*packages):
             v2 = v2.hex()
 
             if command == config.STOP_COMMAND_NAME:
-                activeTask.task.stop()
+                try:
+                    activeTask.task.stop()
+                except:
+                    pass
                 bot.stop()
                 queue = deepcopy([])
                 sleep(0.2)
@@ -96,8 +102,20 @@ def parse_packages(*packages):
             if command == config.M2P_SET_Y:
                 m2p_y = int(v1 + v2,16) / 100
                 continue
+            if command == config.M2P_SET_X_MINUS:
+                m2p_x = -(abs(m2p_x))
+                continue
+            if command == config.M2P_SET_X_PLUS:
+                m2p_x = abs(m2p_x)
+                continue
+            if command == config.M2P_SET_Y_MINUS:
+                m2p_y = -(abs(m2p_y))
+                continue
+            if command == config.M2P_SET_Y_PLUS:
+                m2p_y = abs(m2p_y)
+                continue
             if command == 'ff':
-                os.system("rosservice call /reset")
+                bot.resetOdom()
                 continue
             if command == config.M2P_SEND:
                 bot.move2point(Point(m2p_x,m2p_y))

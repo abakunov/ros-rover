@@ -98,7 +98,7 @@ class SPlusBot:
         
         msg = Twist()
         msg.linear.x = velocity
-
+        msg.angular.z = 0
         while self.position - startPoint <= metres * config.MISTAKE_COEF:
             self.velPub.publish(msg)
             loop_rate.sleep()
@@ -149,10 +149,11 @@ class SPlusBot:
 
     def nicerotate2angle(self, angle : float,cnts : float = 0.01):
         msg = Twist()
+        loop_rate = rospy.Rate(config.DEFAULT_LOOP_RATE )
         while True:
             first_val = angle - self.position.theta.toTheta()
             second_val =  angle + ( 360 - self.position.theta.toTheta())
-            if min(abs(first_val),abs(second_val))<=0.5:
+            if min(abs(first_val),abs(second_val))<=1.5:
                 break 
             if abs(first_val) < abs(second_val):
                 if first_val <=0:
@@ -163,8 +164,9 @@ class SPlusBot:
                 if second_val <=0:
                     msg.angular.z = cnts * abs(second_val)
                 else:
-                    msg.angular.z = -cnts * abs(second_val)
+                    msg.angular.z = cnts * abs(second_val)
             self.velPub.publish(msg)
+            loop_rate.sleep()
         self.stop()
         time.sleep(0.3)
     def calculate_angle(self,bot_pos, point):
@@ -189,7 +191,7 @@ class SPlusBot:
         #print("vel2",-0.001 * (self.calculate_angle(self.position, point) - self.position.theta.toTheta()*-1))
         first_val = self.calculate_angle(self.position, point) - self.position.theta.toTheta()
         second_val =  self.calculate_angle(self.position, point) + ( 360 - self.position.theta.toTheta())
-        if min(abs(first_val),abs(second_val))<=1:
+        if min(abs(first_val),abs(second_val))<=1.5:
             return 0
         if abs(first_val) < abs(second_val):
             if first_val <=0:
@@ -200,7 +202,7 @@ class SPlusBot:
             if second_val <=0:
                 return cnts * abs(second_val)
             else:
-                return -cnts * abs(second_val)
+                return cnts * abs(second_val)
         print(first_val, second_val)
         print(self.calculate_angle(self.position, point),"calculated")
         print(self.position.theta.toTheta())
@@ -214,7 +216,7 @@ class SPlusBot:
             return 0.002 * abs( self.calculate_angle(self.position, point) - self.position.theta.toTheta())
 
     def move2point(self, point : Point):
-        
+        print("!")
         bot_pos = self.position
         start_point = deepcopy(bot_pos)
         last_point = deepcopy(start_point)
@@ -222,7 +224,7 @@ class SPlusBot:
         current = self.position.theta.toTheta()
         x_diff = (bot_pos.x - point.x)
         y_diff = (bot_pos.y - point.y)
-
+        
         if y_diff <= 0:
             if x_diff <= 0:
                 deg = deg % 360
@@ -236,13 +238,14 @@ class SPlusBot:
 
 
         #time.sleep(21)
-        self.rotate2angle(deg)
-        
-        time.sleep(10)
+        self.nicerotate2angle(deg)
+        print("!")
+        time.sleep(2)
         
 
         vel_msg = Twist()
         vel_msg.linear.x = self.LINEAR_SPEED  
+        vel_msg.angular.z = 0
         rate = rospy.Rate(config.DEFAULT_LOOP_RATE) 
         while abs(self.position - point) >= 0.1:
             if abs(last_point - self.position)  >=  abs(start_point - point) / 4:
@@ -251,9 +254,10 @@ class SPlusBot:
                 while self.calculate_ang_vel(start_point , point) != 0:
                     sss.angular.z = self.calculate_ang_vel(start_point , point)
                     self.velPub.publish(sss)
+                    rate.sleep()
                 self.stop()
                  
-                last_point = deepcopy(start_point)
+                last_point = deepcopy(self.position)
             
             self.velPub.publish(vel_msg)
             rate.sleep()
@@ -282,4 +286,7 @@ class SPlusBot:
     def turnOffLed(self):
         self.led.turn_off()
         
-    
+    def testangle(point):
+                while self.calculate_ang_vel(start_point , point) != 0:
+                    sss.angular.z = self.calculate_ang_vel(start_point , point)
+                    self.velPub.publish(sss)
